@@ -5,7 +5,6 @@ using Microsoft.Identity.Client;
 using System;
 using System.Collections.Generic;
 using System.Collections.Specialized;
-using System.Configuration;
 using System.Linq;
 using System.Net.Http;
 using System.Net.Http.Headers;
@@ -92,7 +91,7 @@ namespace Cyc.MicrosoftApi {
 		}
 
 		private void AppConfig() {
-			var appConfig = ConfigurationManager.AppSettings;
+			var appConfig = System.Configuration.ConfigurationManager.AppSettings;
 			if (!ContainsKey(appConfig, nameof(appId))) {
 				throw new ArgumentException($"Given {nameof(appConfig)} has no  configuration key named {nameof(appId)}");
 			}
