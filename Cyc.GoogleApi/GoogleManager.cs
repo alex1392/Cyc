@@ -71,7 +71,7 @@ namespace Cyc.GoogleApi {
 			using var cts = new CancellationTokenSource(Timeouts.Silent);
 			return await GoogleWebAuthorizationBroker.AuthorizeAsync(
 				GoogleClientSecrets.Load(stream).Secrets,
-				new[] { DriveService.Scope.Drive },
+				scopes,
 				"user",
 				cts.Token).ConfigureAwait(false);
 		}
