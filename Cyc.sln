@@ -3,7 +3,7 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 16
 VisualStudioVersion = 16.0.30104.148
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Cyc.Core", "Cyc\Cyc.Core.csproj", "{17EE18C0-6444-414B-B2D0-57F1F7DE74A5}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Cyc.Standard", "Cyc\Cyc.Standard.csproj", "{17EE18C0-6444-414B-B2D0-57F1F7DE74A5}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Cyc.MicrosoftApi", "Cyc.MicrosoftApi\Cyc.MicrosoftApi.csproj", "{07CB7E6E-C75B-4F38-A962-C8AEE2EC2667}"
 EndProject
