@@ -21,7 +21,10 @@ namespace Cyc.GoogleApi {
 		private readonly UserCredential credential;
 		private readonly DriveService service;
 
-		public GoogleManager(string clientSecretsPath) {
+		public GoogleManager(string clientSecretsPath = null) {
+			if (clientSecretsPath == null) {
+				clientSecretsPath = @"GoogleApi\client_secret.json";
+			}
 			credential = FromFileAsync(
 				clientSecretsPath,
 				scopes).Result;
