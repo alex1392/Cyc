@@ -21,7 +21,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\Cyc\Cyc.Standard.csproj" />
+    <ProjectReference Include="..\Cyc.Standard\Cyc.Standard.csproj" />
   </ItemGroup>
 
 </Project>

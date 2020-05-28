@@ -10,9 +10,7 @@ using System.Reflection;
 using System.Threading;
 using System.Threading.Tasks;
 using File = Google.Apis.Drive.v3.Data.File;
-/// <summary>
-///  dfjidasjfoadjf;adsijfas;
-/// </summary>
+
 namespace Cyc.GoogleApi {
 	public class GoogleManager {
 		private class Timeouts {
@@ -38,11 +36,10 @@ namespace Cyc.GoogleApi {
 				});
 		}
 
-		public async Task<User> GetUserAsync() {
+		public async Task<About> GetAboutAsync() {
 			var request = service.About.Get();
 			request.Fields = "user";
-			var about = await request.ExecuteAsync().ConfigureAwait(false);
-			return about.User;
+			return await request.ExecuteAsync().ConfigureAwait(false);
 		}
 
 		public async Task<File> GetDriveRootAsync() {
