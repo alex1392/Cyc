@@ -149,7 +149,6 @@
     <Reference Include="WindowsBase" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="DebugLogger.cs" />
     <Compile Include="GoogleApi\GoogleManagerTests.cs" />
     <Compile Include="MicrosoftApi\MicrosoftManagerTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

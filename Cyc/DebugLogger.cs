@@ -1,9 +1,8 @@
-﻿using Cyc.Standard;
-using System;
+﻿using System;
 using System.Text;
 
 
-namespace Cyc.Tests {
+namespace Cyc.Standard {
 
 	public class DebugLogger : ILogger {
 		public void Log(Exception ex) {
