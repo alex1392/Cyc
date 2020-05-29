@@ -108,7 +108,7 @@ namespace Cyc.MicrosoftApi {
 			}
 		}
 
-		public async IAsyncEnumerable<(string, IAccount)> GetAllAccessTokenSilently() {
+		public async IAsyncEnumerable<AuthenticationResult> LoginAllUserSilently() {
 			var accounts = await msalClient.GetAccountsAsync().ConfigureAwait(false);
 			foreach (var account in accounts) {
 				AuthenticationResult result;
@@ -123,10 +123,10 @@ namespace Cyc.MicrosoftApi {
 					logger.Log(ex);
 					continue;
 				}
-				yield return (result?.AccessToken, result?.Account);
+				yield return result;
 			}
 		}
-		public async Task<(string, IAccount)> GetAccessTokenInteractively(IAccount account = null, string claims = null) {
+		public async Task<AuthenticationResult> LoginInteractively(IAccount account = null, string claims = null) {
 			var requestBuilder = msalClient.AcquireTokenInteractive(scopes);
 			if (claims != null) {
 				requestBuilder = requestBuilder.WithClaims(claims);
@@ -134,13 +134,12 @@ namespace Cyc.MicrosoftApi {
 			if (account != null) {
 				requestBuilder = requestBuilder.WithAccount(account);
 			}
-			AuthenticationResult result;
 			try {
-				result = await requestBuilder
+				var result = await requestBuilder
 					.ExecuteAsync()
 					.ConfigureAwait(false);
 				RegisterUser(result?.Account);
-				return (result?.AccessToken, result?.Account);
+				return result;
 			} catch (MsalClientException) {
 				Console.WriteLine("User cancelled");
 			} catch (MsalException ex) {
@@ -148,26 +147,29 @@ namespace Cyc.MicrosoftApi {
 			} catch (InvalidOperationException ex) {
 				logger.Log(ex);
 			}
-			return (null, null);
+			return null;
 		}
 		/// <summary>
 		/// This method can only be used with <see cref="Authority.Organizations"/> 
 		/// Only used in test.
 		/// </summary>
-		public async Task<(string, IAccount)> GetAccessTokenWithUsernamePassword() {
-			if (username == null || password == null) {
-				return (null, null);
+		public async Task<AuthenticationResult> LoginWithUsernamePassword(string username = null, string password = null) {
+			this.username = username ?? this.username;
+			this.password = password ?? this.password;
+			if (this.username == null || this.password == null) {
+				return null;
 			}
 			using var cts = new CancellationTokenSource(Timeouts.Silent);
 			var secureString = new SecureString();
-			foreach (var c in password ?? "") {
+			foreach (var c in this.password ?? "") {
 				secureString.AppendChar(c);
 			}
 			var result = await msalClient
-				.AcquireTokenByUsernamePassword(scopes, username, secureString)
+				.AcquireTokenByUsernamePassword(scopes, this.username, secureString)
 				.ExecuteAsync(cts.Token).ConfigureAwait(false);
-			RegisterUser(result?.Account);
-			return (result?.AccessToken, result?.Account);
+			var account = result?.Account;
+			RegisterUser(account);
+			return result;
 		}
 		/// <summary>
 		/// Implementation of <see cref="IAuthenticationProvider"/>. This method is called everytime when <see cref="MicrosoftManager"/> make a request.
@@ -262,8 +264,8 @@ namespace Cyc.MicrosoftApi {
 
 				return result?.AccessToken;
 			} catch (MsalUiRequiredException ex) {
-				var (token, _) = await GetAccessTokenInteractively(account, ex.Claims).ConfigureAwait(false);
-				return token;
+				var result = await LoginInteractively(account, ex.Claims).ConfigureAwait(false);
+				return result?.AccessToken;
 			} catch (ServiceException ex) {
 				// onedrive server errors
 				logger.Log(ex);
