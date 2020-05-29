@@ -25,7 +25,7 @@ namespace Cyc.GoogleApi {
 		}
 
 		private readonly ILogger logger;
-		private readonly Dictionary<string, DriveService> driveServiceRegistry = new Dictionary<string, DriveService>();
+		private readonly Dictionary<string, (DriveService driveService, UserCredential userCredential)> userRegistry = new Dictionary<string, (DriveService, UserCredential)>();
 		public string[] Scopes { get; set; } = new[] { DriveService.Scope.Drive };
 		public string ClientSecretsPath { get; set; } = @"GoogleApi\client_secret.json";
 
@@ -36,18 +36,30 @@ namespace Cyc.GoogleApi {
 		}
 
 		public async Task<About> GetAboutAsync(string userId) {
-			var request = driveServiceRegistry[userId].About.Get();
+			if (!userRegistry.ContainsKey(userId)) {
+				logger.Log("User has not been registered.");
+				return null;
+			}
+			var request = userRegistry[userId].driveService.About.Get();
 			request.Fields = "user";
 			return await request.ExecuteAsync().ConfigureAwait(false);
 		}
 
 		public async Task<File> GetDriveRootAsync(string userId) {
-			var root = await driveServiceRegistry[userId].Files.Get("root").ExecuteAsync().ConfigureAwait(false);
+			if (!userRegistry.ContainsKey(userId)) {
+				logger.Log("User has not been registered.");
+				return null;
+			}
+			var root = await userRegistry[userId].driveService.Files.Get("root").ExecuteAsync().ConfigureAwait(false);
 			return root;
 		}
 
 		public async IAsyncEnumerable<File> GetChildrenAsync(string userId, string id) {
-			var request = driveServiceRegistry[userId].Files.List();
+			if (!userRegistry.ContainsKey(userId)) {
+				logger.Log("User has not been registered.");
+				yield break;
+			}
+			var request = userRegistry[userId].driveService.Files.List();
 			request.Q = $"parents in '{id}' and trashed = false";
 			do {
 				var fileList = await request.ExecuteAsync().ConfigureAwait(false);
@@ -88,11 +100,11 @@ namespace Cyc.GoogleApi {
 					HttpClientInitializer = credential,
 					ApplicationName = Assembly.GetExecutingAssembly().GetName().Name,
 				});
-			if (!driveServiceRegistry.ContainsKey(userId)) {
-				driveServiceRegistry.Add(userId, service);
+			if (!userRegistry.ContainsKey(userId)) {
+				userRegistry.Add(userId, (service, credential));
 			} else {
-				driveServiceRegistry[userId].Dispose(); // dispose old service
-				driveServiceRegistry[userId] = service;
+				userRegistry[userId].driveService.Dispose(); // dispose old service
+				userRegistry[userId] = (service, credential);
 			}
 			return userId;
 		}
@@ -103,12 +115,21 @@ namespace Cyc.GoogleApi {
 			return filepaths.Select(path => string.Concat(path.SkipWhile(c => c != '-')).Remove(0,1));
 		}
 
-		public void UserLogout() {
-
+		public async Task<bool> UserLogoutAsync(string userId) {
+			if (!userRegistry.ContainsKey(userId)) {
+				logger.Log("User has not been registered.");
+				return false;
+			}
+			using var cts = new CancellationTokenSource(Timeouts.Silent);
+			var result = await userRegistry[userId].userCredential.RevokeTokenAsync(cts.Token).ConfigureAwait(false);
+			if (result == true) {
+				userRegistry.Remove(userId);
+			}
+			return result;
 		}
 
 
-		public async Task<UserCredential> GetUserCredentialInteractivelyAsync(string path, IEnumerable<string> scopes) {
+		private async Task<UserCredential> GetUserCredentialInteractivelyAsync(string path, IEnumerable<string> scopes) {
 			var app = GetAuthorizationCodeInstalledApp(path, scopes);
 
 			var redirectUri = app.CodeReceiver.RedirectUri;
@@ -126,6 +147,19 @@ namespace Cyc.GoogleApi {
 				CancellationToken.None).ConfigureAwait(false);
 			return new UserCredential(app.Flow, "user", token);
 		}
+		private async Task<UserCredential> UserLoginSilently(string userId) {
+			var app = GetAuthorizationCodeInstalledApp(ClientSecretsPath, Scopes);
+
+			using var cts = new CancellationTokenSource(Timeouts.Silent);
+			var token = await app.Flow.LoadTokenAsync(userId, cts.Token).ConfigureAwait(false);
+
+			if (app.ShouldRequestAuthorizationCode(token)) {
+				return null;
+			}
+
+			return new UserCredential(app.Flow, userId, token);
+
+		}
 
 		private static AuthorizationCodeInstalledApp GetAuthorizationCodeInstalledApp(string path, IEnumerable<string> scopes) {
 			var stream = new FileStream(path, FileMode.Open, FileAccess.Read);
@@ -141,18 +175,5 @@ namespace Cyc.GoogleApi {
 			return app;
 		}
 
-		public async Task<UserCredential> UserLoginSilently(string userId) {
-			var app = GetAuthorizationCodeInstalledApp(ClientSecretsPath, Scopes);
-
-			using var cts = new CancellationTokenSource(Timeouts.Silent);
-			var token = await app.Flow.LoadTokenAsync(userId, cts.Token).ConfigureAwait(false);
-
-			if (app.ShouldRequestAuthorizationCode(token)) {
-				return null;
-			}
-
-			return new UserCredential(app.Flow, userId, token);
-
-		}
 	}
 }
