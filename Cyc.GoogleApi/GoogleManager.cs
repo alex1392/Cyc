@@ -28,10 +28,14 @@ namespace Cyc.GoogleApi {
 		private readonly Dictionary<string, (DriveService driveService, UserCredential userCredential)> userRegistry = new Dictionary<string, (DriveService, UserCredential)>();
 		public string[] Scopes { get; set; } = new[] { DriveService.Scope.Drive };
 		public string ClientSecretsPath { get; set; } = @"GoogleApi\client_secret.json";
+		public string DataStorePath { get; private set; } = GoogleWebAuthorizationBroker.Folder;
 
-		public GoogleManager(ILogger logger, string clientSecretsPath = null, string[] scopes = null) {
+		public bool HasUser(string userId) => userRegistry.ContainsKey(userId);
+
+		public GoogleManager(ILogger logger, string clientSecretsPath = null, string[] scopes = null, string dataStorePath = null) {
 			ClientSecretsPath = clientSecretsPath ?? ClientSecretsPath;
 			Scopes = scopes ?? Scopes;
+			this.DataStorePath = dataStorePath ?? dataStorePath;
 			this.logger = logger;
 		}
 
@@ -89,7 +93,8 @@ namespace Cyc.GoogleApi {
 					GoogleClientSecrets.Load(stream).Secrets,
 					Scopes,
 					userId,
-					cts.Token).ConfigureAwait(false);
+					cts.Token,
+					new FileDataStore(DataStorePath)).ConfigureAwait(false);
 			} catch (OperationCanceledException ex) {
 				logger.Log(ex);
 				return null;
@@ -110,7 +115,7 @@ namespace Cyc.GoogleApi {
 		}
 
 		public IEnumerable<string> LoadAllUserId() {
-			var datastore = new FileDataStore(GoogleWebAuthorizationBroker.Folder);
+			var datastore = new FileDataStore(DataStorePath);
 			var filepaths = Directory.GetFiles(datastore.FolderPath);
 			return filepaths.Select(path => string.Concat(path.SkipWhile(c => c != '-')).Remove(0,1));
 		}
@@ -127,6 +132,8 @@ namespace Cyc.GoogleApi {
 			}
 			return result;
 		}
+
+
 
 
 		private async Task<UserCredential> GetUserCredentialInteractivelyAsync(string path, IEnumerable<string> scopes) {
