@@ -1,4 +1,5 @@
 using Cyc.Standard;
+
 using Microsoft.Graph;
 using Microsoft.Identity.Client;
 
