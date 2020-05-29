@@ -3,6 +3,7 @@ using Cyc.Standard;
 using Google.Apis.Auth.OAuth2;
 using Google.Apis.Auth.OAuth2.Flows;
 using Google.Apis.Auth.OAuth2.Responses;
+using Google.Apis.Download;
 using Google.Apis.Drive.v3;
 using Google.Apis.Drive.v3.Data;
 using Google.Apis.Services;
@@ -25,6 +26,10 @@ namespace Cyc.GoogleApi {
 		}
 		private readonly ILogger logger;
 		private readonly Dictionary<string, (DriveService driveService, UserCredential userCredential)> userRegistry = new Dictionary<string, (DriveService, UserCredential)>();
+
+		public event EventHandler BeforeTaskExecute;
+		public event EventHandler TaskExecuted;
+
 		public string[] Scopes { get; set; } = new[] { DriveService.Scope.Drive };
 		public string ClientSecretsPath { get; set; } = @"GoogleApi\client_secret.json";
 		public string DataStorePath { get; private set; } = GoogleWebAuthorizationBroker.Folder;
@@ -34,7 +39,7 @@ namespace Cyc.GoogleApi {
 		public GoogleManager(ILogger logger, string clientSecretsPath = null, string[] scopes = null, string dataStorePath = null) {
 			ClientSecretsPath = clientSecretsPath ?? ClientSecretsPath;
 			Scopes = scopes ?? Scopes;
-			DataStorePath = dataStorePath ?? dataStorePath;
+			DataStorePath = dataStorePath ?? DataStorePath;
 			this.logger = logger;
 		}
 		public async Task<About> GetAboutAsync(string userId) {
@@ -42,16 +47,21 @@ namespace Cyc.GoogleApi {
 				logger.Log("User has not been registered.");
 				return null;
 			}
+			BeforeTaskExecute?.Invoke(this, null);
 			var request = userRegistry[userId].driveService.About.Get();
 			request.Fields = "user";
-			return await request.ExecuteAsync().ConfigureAwait(false);
+			var about = await request.ExecuteAsync().ConfigureAwait(false);
+			TaskExecuted?.Invoke(this, null);
+			return about;
 		}
 		public async Task<File> GetDriveRootAsync(string userId) {
 			if (!userRegistry.ContainsKey(userId)) {
 				logger.Log("User has not been registered.");
 				return null;
 			}
+			BeforeTaskExecute?.Invoke(this, null);
 			var root = await userRegistry[userId].driveService.Files.Get("root").ExecuteAsync().ConfigureAwait(false);
+			TaskExecuted?.Invoke(this, null);
 			return root;
 		}
 		public async IAsyncEnumerable<File> GetChildrenAsync(string userId, string id) {
@@ -59,6 +69,7 @@ namespace Cyc.GoogleApi {
 				logger.Log("User has not been registered.");
 				yield break;
 			}
+			BeforeTaskExecute?.Invoke(this, null);
 			var request = userRegistry[userId].driveService.Files.List();
 			request.Q = $"parents in '{id}' and trashed = false";
 			do {
@@ -68,8 +79,23 @@ namespace Cyc.GoogleApi {
 				}
 				request.PageToken = fileList.NextPageToken;
 			} while (!string.IsNullOrEmpty(request.PageToken));
+			TaskExecuted?.Invoke(this, null);
+		}
+		public async Task GetFileAsync(string userId, string fileId, string localPath, Action<IDownloadProgress> progressChanged) {
+			if (!userRegistry.ContainsKey(userId)) {
+				logger.Log("User has not been registered.");
+				return;
+			}
+			BeforeTaskExecute?.Invoke(this, null);
+			var request = userRegistry[userId].driveService.Files.Get(fileId);
+			request.MediaDownloader.ProgressChanged += progressChanged;
+			using var stream = new FileStream(localPath, FileMode.OpenOrCreate, FileAccess.Write);
+			await request.DownloadAsync(stream).ConfigureAwait(false);
+			TaskExecuted?.Invoke(this, null);
+			return;
 		}
 		public async Task<string> UserLoginAsync() {
+			BeforeTaskExecute?.Invoke(this, null);
 			var userId = Guid.NewGuid().ToString();
 			using var stream = new FileStream(ClientSecretsPath, FileMode.Open, FileAccess.Read);
 			try {
@@ -81,13 +107,19 @@ namespace Cyc.GoogleApi {
 					cts.Token,
 					new FileDataStore(DataStorePath)).ConfigureAwait(false);
 				RegisterUser(userId, credential);
+				return userId;
+			} catch (TokenResponseException ex) {
+				logger.Log(ex);
+				return null;
 			} catch (OperationCanceledException) {
 				//logger.Log(ex); // do not show message, let the task expires automatically
 				return null;
+			} finally {
+				TaskExecuted?.Invoke(this, null);
 			}
-			return userId;
 		}
 		public async Task<string> UserLoginAsync(string userId) {
+			BeforeTaskExecute?.Invoke(this, null);
 			using var stream = new FileStream(ClientSecretsPath, FileMode.Open, FileAccess.Read);
 			try {
 				using var cts = new CancellationTokenSource(Timeouts.Interactive);
@@ -98,11 +130,16 @@ namespace Cyc.GoogleApi {
 					cts.Token,
 					new FileDataStore(DataStorePath)).ConfigureAwait(false);
 				RegisterUser(userId, credential);
+				return userId;
+			} catch (TokenResponseException ex) {
+				logger.Log(ex);
+				return null;
 			} catch (OperationCanceledException ex) {
 				logger.Log(ex);
 				return null;
+			} finally {
+				TaskExecuted?.Invoke(this, null);
 			}
-			return userId;
 		}
 		public IEnumerable<string> LoadAllUserId() {
 			var datastore = new FileDataStore(DataStorePath);
@@ -114,11 +151,13 @@ namespace Cyc.GoogleApi {
 				logger.Log("User has not been registered.");
 				return false;
 			}
+			BeforeTaskExecute?.Invoke(this, null);
 			using var cts = new CancellationTokenSource(Timeouts.Silent);
 			var result = await userRegistry[userId].userCredential.RevokeTokenAsync(cts.Token).ConfigureAwait(false);
 			if (result == true) {
 				userRegistry.Remove(userId);
 			}
+			TaskExecuted?.Invoke(this, null);
 			return result;
 		}
 		private void RegisterUser(string userId, UserCredential credential) {

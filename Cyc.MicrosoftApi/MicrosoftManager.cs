@@ -6,6 +6,7 @@ using Microsoft.Identity.Client;
 using System;
 using System.Collections.Generic;
 using System.Collections.Specialized;
+using System.IO;
 using System.Linq;
 using System.Net.Http;
 using System.Net.Http.Headers;
@@ -75,6 +76,9 @@ namespace Cyc.MicrosoftApi {
 		private readonly List<IAccount> accountList = new List<IAccount>();
 		#endregion
 
+		public event EventHandler BeforeTaskExecute;
+		public event EventHandler TaskExecuted;
+
 		public MicrosoftManager(ILogger logger = null, string authority = Authority.Common) {
 			graphClient = new GraphServiceClient(this);
 			this.logger = logger;
@@ -110,6 +114,7 @@ namespace Cyc.MicrosoftApi {
 		}
 
 		public async IAsyncEnumerable<AuthenticationResult> LoginAllUserSilently() {
+			BeforeTaskExecute?.Invoke(this, null);
 			var accounts = await msalClient.GetAccountsAsync().ConfigureAwait(false);
 			foreach (var account in accounts) {
 				AuthenticationResult result;
@@ -126,8 +131,10 @@ namespace Cyc.MicrosoftApi {
 				}
 				yield return result;
 			}
+			TaskExecuted?.Invoke(this, null);
 		}
 		public async Task<AuthenticationResult> LoginInteractively(IAccount account = null, string claims = null) {
+			BeforeTaskExecute?.Invoke(this, null);
 			var requestBuilder = msalClient.AcquireTokenInteractive(scopes);
 			if (claims != null) {
 				requestBuilder = requestBuilder.WithClaims(claims);
@@ -148,6 +155,7 @@ namespace Cyc.MicrosoftApi {
 			} catch (InvalidOperationException ex) {
 				logger.Log(ex);
 			}
+			TaskExecuted?.Invoke(this, null);
 			return null;
 		}
 		/// <summary>
@@ -160,6 +168,7 @@ namespace Cyc.MicrosoftApi {
 			if (this.username == null || this.password == null) {
 				return null;
 			}
+			BeforeTaskExecute?.Invoke(this, null);
 			using var cts = new CancellationTokenSource(Timeouts.Silent);
 			var secureString = new SecureString();
 			foreach (var c in this.password ?? "") {
@@ -170,6 +179,8 @@ namespace Cyc.MicrosoftApi {
 				.ExecuteAsync(cts.Token).ConfigureAwait(false);
 			var account = result?.Account;
 			RegisterUser(account);
+
+			TaskExecuted?.Invoke(this, null);
 			return result;
 		}
 		/// <summary>
@@ -190,6 +201,7 @@ namespace Cyc.MicrosoftApi {
 			request.Headers.Authorization = new AuthenticationHeaderValue("bearer", token);
 		}
 		public async Task<bool> LogoutAsync(IAccount account) {
+			BeforeTaskExecute?.Invoke(this, null);
 			try {
 				// TODO: this method just clears the cache without truely logout the user!!
 				await msalClient.RemoveAsync(account).ConfigureAwait(false);
@@ -198,9 +210,12 @@ namespace Cyc.MicrosoftApi {
 			} catch (Exception ex) {
 				logger.Log(ex);
 				return false;
+			} finally {
+				TaskExecuted?.Invoke(this, null);
 			}
 		}
 		public async Task<User> GetUserAsync(IAccount account) {
+			BeforeTaskExecute?.Invoke(this, null);
 			var userId = GetUserId(account);
 			using var cts = new CancellationTokenSource(Timeouts.Silent);
 			try {
@@ -210,9 +225,13 @@ namespace Cyc.MicrosoftApi {
 				// onedrive server errors
 				logger.Log(ex);
 				return null;
+			} finally {
+				TaskExecuted?.Invoke(this, null);
+
 			}
 		}
 		public async Task<DriveItem> GetDriveRootAsync(IAccount account) {
+			BeforeTaskExecute?.Invoke(this, null);
 			var userId = GetUserId(account);
 			using var cts = new CancellationTokenSource(Timeouts.Silent);
 			try {
@@ -221,9 +240,12 @@ namespace Cyc.MicrosoftApi {
 				// onedrive server errors
 				logger.Log(ex);
 				return null;
+			} finally {
+				TaskExecuted?.Invoke(this, null);
 			}
 		}
-		public async IAsyncEnumerable<DriveItem> GetChildrenAsync(string parentId, IAccount account) {
+		public async IAsyncEnumerable<DriveItem> GetChildrenAsync(IAccount account, string parentId) {
+			BeforeTaskExecute?.Invoke(this, null);
 			var userId = GetUserId(account);
 			using var cts = new CancellationTokenSource(Timeouts.Silent);
 			var request = graphClient.Users[userId].Drive.Items[parentId].Children.Request();
@@ -233,10 +255,12 @@ namespace Cyc.MicrosoftApi {
 					page = await request.GetAsync(cts.Token).ConfigureAwait(false);
 				} catch (TaskCanceledException ex) {
 					logger.Log(ex);
+					TaskExecuted?.Invoke(this, null);
 					yield break;
 				} catch (ServiceException ex) {
 					// onedrive server errors
 					logger.Log(ex);
+					TaskExecuted?.Invoke(this, null);
 					yield break;
 				}
 				foreach (var file in page) {
@@ -244,6 +268,21 @@ namespace Cyc.MicrosoftApi {
 				}
 				request = page?.NextPageRequest;
 			} while (request != null);
+			TaskExecuted?.Invoke(this, null);
+		}
+		public async Task<Stream> GetFileContentAsync(IAccount account, string fileId) {
+			BeforeTaskExecute?.Invoke(this, null);
+			var userId = GetUserId(account);
+			var cts = new CancellationTokenSource(Timeouts.Silent);
+			try {
+				var file = await graphClient.Users[userId].Drive.Items[fileId].Request().GetAsync(cts.Token).ConfigureAwait(false);
+				return file.Content;
+			} catch (ServiceException ex) {
+				logger.Log(ex);
+				return null;
+			} finally {
+				TaskExecuted?.Invoke(this, null);
+			}
 		}
 
 		private void RegisterUser(IAccount account) {
