@@ -19,7 +19,7 @@ using System.Threading.Tasks;
 
 using File = Google.Apis.Drive.v3.Data.File;
 namespace Cyc.GoogleApi {
-	public class GoogleManager {
+	public class GoogleApiManager {
 		private class Timeouts {
 			public static readonly TimeSpan Silent = TimeSpan.FromSeconds(10);
 			public static readonly TimeSpan Interactive = TimeSpan.FromMinutes(1);
@@ -36,7 +36,7 @@ namespace Cyc.GoogleApi {
 		public bool HasUser(string userId) {
 			return userRegistry.ContainsKey(userId);
 		}
-		public GoogleManager(ILogger logger, string clientSecretsPath = null, string[] scopes = null, string dataStorePath = null) {
+		public GoogleApiManager(ILogger logger, string clientSecretsPath = null, string[] scopes = null, string dataStorePath = null) {
 			ClientSecretsPath = clientSecretsPath ?? ClientSecretsPath;
 			Scopes = scopes ?? Scopes;
 			DataStorePath = dataStorePath ?? DataStorePath;
@@ -81,7 +81,7 @@ namespace Cyc.GoogleApi {
 			} while (!string.IsNullOrEmpty(request.PageToken));
 			TaskExecuted?.Invoke(this, null);
 		}
-		public async Task GetFileAsync(string userId, string fileId, string localPath, Action<IDownloadProgress> progressChanged) {
+		public async Task DownloadAsync(string userId, string fileId, string localPath, Action<IDownloadProgress> progressChanged = null) {
 			if (!userRegistry.ContainsKey(userId)) {
 				logger.Log("User has not been registered.");
 				return;

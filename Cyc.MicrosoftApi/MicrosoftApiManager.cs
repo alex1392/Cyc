@@ -18,7 +18,7 @@ namespace Cyc.MicrosoftApi {
 	/// <summary>
 	/// Handles all graph api calling, includes error handling. If there's any error occurs in the api call, returns null
 	/// </summary>
-	public class MicrosoftManager : IAuthenticationProvider {
+	public class MicrosoftApiManager : IAuthenticationProvider {
 		#region Constants
 		public const string ApiEndpoint = "https://graph.microsoft.com/v1.0/";
 		public static class Selects {
@@ -76,10 +76,10 @@ namespace Cyc.MicrosoftApi {
 		private readonly List<IAccount> accountList = new List<IAccount>();
 		#endregion
 
-		public event EventHandler BeforeTaskExecute;
+		public event EventHandler BeforeTaskExecuted;
 		public event EventHandler TaskExecuted;
 
-		public MicrosoftManager(ILogger logger = null, string authority = Authority.Common) {
+		public MicrosoftApiManager(ILogger logger = null, string authority = Authority.Common) {
 			graphClient = new GraphServiceClient(this);
 			this.logger = logger;
 
@@ -113,8 +113,12 @@ namespace Cyc.MicrosoftApi {
 			}
 		}
 
+		public bool HasUser(IAccount account) {
+			return accountList.Any(a => a.HomeAccountId == account.HomeAccountId);
+		}
+
 		public async IAsyncEnumerable<AuthenticationResult> LoginAllUserSilently() {
-			BeforeTaskExecute?.Invoke(this, null);
+			BeforeTaskExecuted?.Invoke(this, null);
 			var accounts = await msalClient.GetAccountsAsync().ConfigureAwait(false);
 			foreach (var account in accounts) {
 				AuthenticationResult result;
@@ -134,7 +138,7 @@ namespace Cyc.MicrosoftApi {
 			TaskExecuted?.Invoke(this, null);
 		}
 		public async Task<AuthenticationResult> LoginInteractively(IAccount account = null, string claims = null) {
-			BeforeTaskExecute?.Invoke(this, null);
+			BeforeTaskExecuted?.Invoke(this, null);
 			var requestBuilder = msalClient.AcquireTokenInteractive(scopes);
 			if (claims != null) {
 				requestBuilder = requestBuilder.WithClaims(claims);
@@ -168,7 +172,7 @@ namespace Cyc.MicrosoftApi {
 			if (this.username == null || this.password == null) {
 				return null;
 			}
-			BeforeTaskExecute?.Invoke(this, null);
+			BeforeTaskExecuted?.Invoke(this, null);
 			using var cts = new CancellationTokenSource(Timeouts.Silent);
 			var secureString = new SecureString();
 			foreach (var c in this.password ?? "") {
@@ -184,7 +188,7 @@ namespace Cyc.MicrosoftApi {
 			return result;
 		}
 		/// <summary>
-		/// Implementation of <see cref="IAuthenticationProvider"/>. This method is called everytime when <see cref="MicrosoftManager"/> make a request.
+		/// Implementation of <see cref="IAuthenticationProvider"/>. This method is called everytime when <see cref="MicrosoftApiManager"/> make a request.
 		/// </summary>
 		public async Task AuthenticateRequestAsync(HttpRequestMessage request) {
 			var url = request.RequestUri.ToString().ToLower();
@@ -201,7 +205,7 @@ namespace Cyc.MicrosoftApi {
 			request.Headers.Authorization = new AuthenticationHeaderValue("bearer", token);
 		}
 		public async Task<bool> LogoutAsync(IAccount account) {
-			BeforeTaskExecute?.Invoke(this, null);
+			BeforeTaskExecuted?.Invoke(this, null);
 			try {
 				// TODO: this method just clears the cache without truely logout the user!!
 				await msalClient.RemoveAsync(account).ConfigureAwait(false);
@@ -215,7 +219,7 @@ namespace Cyc.MicrosoftApi {
 			}
 		}
 		public async Task<User> GetUserAsync(IAccount account) {
-			BeforeTaskExecute?.Invoke(this, null);
+			BeforeTaskExecuted?.Invoke(this, null);
 			var userId = GetUserId(account);
 			using var cts = new CancellationTokenSource(Timeouts.Silent);
 			try {
@@ -231,7 +235,7 @@ namespace Cyc.MicrosoftApi {
 			}
 		}
 		public async Task<DriveItem> GetDriveRootAsync(IAccount account) {
-			BeforeTaskExecute?.Invoke(this, null);
+			BeforeTaskExecuted?.Invoke(this, null);
 			var userId = GetUserId(account);
 			using var cts = new CancellationTokenSource(Timeouts.Silent);
 			try {
@@ -245,7 +249,7 @@ namespace Cyc.MicrosoftApi {
 			}
 		}
 		public async IAsyncEnumerable<DriveItem> GetChildrenAsync(IAccount account, string parentId) {
-			BeforeTaskExecute?.Invoke(this, null);
+			BeforeTaskExecuted?.Invoke(this, null);
 			var userId = GetUserId(account);
 			using var cts = new CancellationTokenSource(Timeouts.Silent);
 			var request = graphClient.Users[userId].Drive.Items[parentId].Children.Request();
@@ -271,7 +275,7 @@ namespace Cyc.MicrosoftApi {
 			TaskExecuted?.Invoke(this, null);
 		}
 		public async Task<Stream> GetFileContentAsync(IAccount account, string fileId) {
-			BeforeTaskExecute?.Invoke(this, null);
+			BeforeTaskExecuted?.Invoke(this, null);
 			var userId = GetUserId(account);
 			var cts = new CancellationTokenSource(Timeouts.Silent);
 			try {
