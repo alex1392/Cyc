@@ -60,7 +60,9 @@ namespace Cyc.GoogleApi {
 				return null;
 			}
 			BeforeTaskExecute?.Invoke(this, null);
-			var root = await userRegistry[userId].driveService.Files.Get("root").ExecuteAsync().ConfigureAwait(false);
+			var request = userRegistry[userId].driveService.Files.Get("root");
+			request.Fields = "*";
+			var root = await request.ExecuteAsync().ConfigureAwait(false);
 			TaskExecuted?.Invoke(this, null);
 			return root;
 		}
@@ -72,6 +74,7 @@ namespace Cyc.GoogleApi {
 			BeforeTaskExecute?.Invoke(this, null);
 			var request = userRegistry[userId].driveService.Files.List();
 			request.Q = $"parents in '{id}' and trashed = false";
+			request.Fields = "*";
 			do {
 				var fileList = await request.ExecuteAsync().ConfigureAwait(false);
 				foreach (var file in fileList.Files) {

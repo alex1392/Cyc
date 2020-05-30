@@ -279,8 +279,7 @@ namespace Cyc.MicrosoftApi {
 			var userId = GetUserId(account);
 			var cts = new CancellationTokenSource(Timeouts.Silent);
 			try {
-				var file = await graphClient.Users[userId].Drive.Items[fileId].Request().GetAsync(cts.Token).ConfigureAwait(false);
-				return file.Content;
+				return await graphClient.Users[userId].Drive.Items[fileId].Content.Request().GetAsync(cts.Token).ConfigureAwait(false);
 			} catch (ServiceException ex) {
 				logger.Log(ex);
 				return null;
