@@ -1,4 +1,5 @@
 ﻿namespace Cyc.Mvvm.Commands {
+
 	/// <summary>
 	/// The definition of the converter used to convert an EventArgs
 	/// in the <see cref="EventToCommand"/> class, if the
@@ -7,6 +8,9 @@
 	/// property of the EventToCommand instance.
 	/// </summary>
 	public interface IEventArgsConverter {
+
+		#region Public Methods
+
 		/// <summary>
 		/// The method used to convert the EventArgs instance.
 		/// </summary>
@@ -17,5 +21,7 @@
 		/// to set this value. This may be null.</param>
 		/// <returns>The converted value.</returns>
 		object Convert(object value, object parameter);
+
+		#endregion Public Methods
 	}
 }

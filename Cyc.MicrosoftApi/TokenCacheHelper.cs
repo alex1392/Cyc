@@ -4,25 +4,28 @@ using System.IO;
 using System.Security.Cryptography;
 
 namespace Cyc.MicrosoftApi {
+
 	internal static class TokenCacheHelper {
+
+		#region Public Fields
+
 		/// <summary>
 		/// Path to the token cache
 		/// </summary>
 		public static readonly string CacheFilePath = System.Reflection.Assembly.GetExecutingAssembly().Location + ".msalcache.bin3";
 
+		#endregion Public Fields
+
+		#region Private Fields
+
 		private static readonly object FileLock = new object();
 
-		public static void BeforeAccessNotification(TokenCacheNotificationArgs args) {
-			lock (FileLock) {
-				args.TokenCache.DeserializeMsalV3(File.Exists(CacheFilePath)
-						? ProtectedData.Unprotect(File.ReadAllBytes(CacheFilePath),
-												 null,
-												 DataProtectionScope.CurrentUser)
-						: null);
-			}
-		}
+		#endregion Private Fields
 
-		public static void AfterAccessNotification(TokenCacheNotificationArgs args) {
+		#region Public Methods
+
+		public static void AfterAccessNotification(TokenCacheNotificationArgs args)
+		{
 			// if the access operation resulted in a cache update
 			if (args.HasStateChanged) {
 				lock (FileLock) {
@@ -36,9 +39,27 @@ namespace Cyc.MicrosoftApi {
 			}
 		}
 
-		internal static void EnableSerialization(ITokenCache tokenCache) {
+		public static void BeforeAccessNotification(TokenCacheNotificationArgs args)
+		{
+			lock (FileLock) {
+				args.TokenCache.DeserializeMsalV3(File.Exists(CacheFilePath)
+						? ProtectedData.Unprotect(File.ReadAllBytes(CacheFilePath),
+												 null,
+												 DataProtectionScope.CurrentUser)
+						: null);
+			}
+		}
+
+		#endregion Public Methods
+
+		#region Internal Methods
+
+		internal static void EnableSerialization(ITokenCache tokenCache)
+		{
 			tokenCache.SetBeforeAccess(BeforeAccessNotification);
 			tokenCache.SetAfterAccess(AfterAccessNotification);
 		}
+
+		#endregion Internal Methods
 	}
 }
