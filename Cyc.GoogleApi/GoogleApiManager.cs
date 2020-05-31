@@ -229,17 +229,16 @@ namespace Cyc.GoogleApi {
 		}
 		private void RegisterUser(string userId, UserCredential credential)
 		{
+			if (userRegistry.ContainsKey(userId)) {
+				throw new InvalidOperationException("User has already logged in.");
+			}
 			var service = new DriveService(new BaseClientService.Initializer
 			{
 				HttpClientInitializer = credential,
 				ApplicationName = Assembly.GetExecutingAssembly().GetName().Name,
 			});
-			if (!userRegistry.ContainsKey(userId)) {
-				userRegistry.Add(userId, (service, credential));
-			} else {
-				userRegistry[userId].driveService.Dispose(); // dispose old service
-				userRegistry[userId] = (service, credential);
-			}
+			userRegistry.Add(userId, (service, credential));
+
 		}
 		[Obsolete]
 		private async Task<UserCredential> GetUserCredentialInteractivelyAsync(string path, IEnumerable<string> scopes)

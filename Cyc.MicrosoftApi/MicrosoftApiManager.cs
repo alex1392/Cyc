@@ -114,8 +114,8 @@ namespace Cyc.MicrosoftApi {
 			}
 		}
 
-		public bool HasUser(IAccount account) {
-			return accountList.Any(a => a.HomeAccountId == account.HomeAccountId);
+		public bool HasAccount(IAccount account) {
+			return accountList.Any(a => a.HomeAccountId.Identifier == account.HomeAccountId.Identifier);
 		}
 
 		public async IAsyncEnumerable<AuthenticationResult> LoginAllUserSilently() {
@@ -310,9 +310,8 @@ namespace Cyc.MicrosoftApi {
 		}
 
 		private void RegisterUser(IAccount account) {
-			if (accountList.Contains(account)) {
-				logger?.Log("The user has already signed in.");
-				return;
+			if (HasAccount(account)) {
+				throw new InvalidOperationException("The user has already signed in.");
 			}
 			accountList.Add(account);
 		}
