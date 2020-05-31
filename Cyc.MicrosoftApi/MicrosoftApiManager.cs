@@ -130,7 +130,7 @@ namespace Cyc.MicrosoftApi {
 
 					RegisterUser(result?.Account);
 				} catch (Exception ex) {
-					logger.Log(ex);
+					logger?.Log(ex);
 					continue;
 				}
 				yield return result;
@@ -157,7 +157,7 @@ namespace Cyc.MicrosoftApi {
 			} catch (MsalException ex) {
 				Console.WriteLine(ex.Message);
 			} catch (InvalidOperationException ex) {
-				logger.Log(ex);
+				logger?.Log(ex);
 			}
 			TaskExecuted?.Invoke(this, null);
 			return null;
@@ -212,7 +212,7 @@ namespace Cyc.MicrosoftApi {
 				accountList.Remove(account);
 				return true;
 			} catch (Exception ex) {
-				logger.Log(ex);
+				logger?.Log(ex);
 				return false;
 			} finally {
 				TaskExecuted?.Invoke(this, null);
@@ -227,7 +227,7 @@ namespace Cyc.MicrosoftApi {
 				return user;
 			} catch (ServiceException ex) {
 				// onedrive server errors
-				logger.Log(ex);
+				logger?.Log(ex);
 				return null;
 			} finally {
 				TaskExecuted?.Invoke(this, null);
@@ -242,7 +242,7 @@ namespace Cyc.MicrosoftApi {
 				return await graphClient.Users[userId].Drive.Root.Request().GetAsync(cts.Token).ConfigureAwait(false);
 			} catch (ServiceException ex) {
 				// onedrive server errors
-				logger.Log(ex);
+				logger?.Log(ex);
 				return null;
 			} finally {
 				TaskExecuted?.Invoke(this, null);
@@ -258,12 +258,12 @@ namespace Cyc.MicrosoftApi {
 				try {
 					page = await request.GetAsync(cts.Token).ConfigureAwait(false);
 				} catch (TaskCanceledException ex) {
-					logger.Log(ex);
+					logger?.Log(ex);
 					TaskExecuted?.Invoke(this, null);
 					yield break;
 				} catch (ServiceException ex) {
 					// onedrive server errors
-					logger.Log(ex);
+					logger?.Log(ex);
 					TaskExecuted?.Invoke(this, null);
 					yield break;
 				}
@@ -281,7 +281,7 @@ namespace Cyc.MicrosoftApi {
 			try {
 				return await graphClient.Users[userId].Drive.Items[fileId].Content.Request().GetAsync(cts.Token).ConfigureAwait(false);
 			} catch (ServiceException ex) {
-				logger.Log(ex);
+				logger?.Log(ex);
 				return null;
 			} finally {
 				TaskExecuted?.Invoke(this, null);
@@ -290,7 +290,7 @@ namespace Cyc.MicrosoftApi {
 
 		private void RegisterUser(IAccount account) {
 			if (accountList.Contains(account)) {
-				logger.Log("The user has already signed in.");
+				logger?.Log("The user has already signed in.");
 				return;
 			}
 			accountList.Add(account);
@@ -311,7 +311,7 @@ namespace Cyc.MicrosoftApi {
 				return result?.AccessToken;
 			} catch (ServiceException ex) {
 				// onedrive server errors
-				logger.Log(ex);
+				logger?.Log(ex);
 				return null;
 			}
 		}

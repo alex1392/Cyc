@@ -44,7 +44,7 @@ namespace Cyc.GoogleApi {
 		}
 		public async Task<About> GetAboutAsync(string userId) {
 			if (!userRegistry.ContainsKey(userId)) {
-				logger.Log("User has not been registered.");
+				logger?.Log("User has not been registered.");
 				return null;
 			}
 			BeforeTaskExecute?.Invoke(this, null);
@@ -56,7 +56,7 @@ namespace Cyc.GoogleApi {
 		}
 		public async Task<File> GetDriveRootAsync(string userId) {
 			if (!userRegistry.ContainsKey(userId)) {
-				logger.Log("User has not been registered.");
+				logger?.Log("User has not been registered.");
 				return null;
 			}
 			BeforeTaskExecute?.Invoke(this, null);
@@ -68,7 +68,7 @@ namespace Cyc.GoogleApi {
 		}
 		public async IAsyncEnumerable<File> GetChildrenAsync(string userId, string id) {
 			if (!userRegistry.ContainsKey(userId)) {
-				logger.Log("User has not been registered.");
+				logger?.Log("User has not been registered.");
 				yield break;
 			}
 			BeforeTaskExecute?.Invoke(this, null);
@@ -86,7 +86,7 @@ namespace Cyc.GoogleApi {
 		}
 		public async Task DownloadAsync(string userId, string fileId, string localPath, Action<IDownloadProgress> progressChanged = null) {
 			if (!userRegistry.ContainsKey(userId)) {
-				logger.Log("User has not been registered.");
+				logger?.Log("User has not been registered.");
 				return;
 			}
 			BeforeTaskExecute?.Invoke(this, null);
@@ -112,10 +112,10 @@ namespace Cyc.GoogleApi {
 				RegisterUser(userId, credential);
 				return userId;
 			} catch (TokenResponseException ex) {
-				logger.Log(ex);
+				logger?.Log(ex);
 				return null;
 			} catch (OperationCanceledException) {
-				//logger.Log(ex); // do not show message, let the task expires automatically
+				//logger?.Log(ex); // do not show message, let the task expires automatically
 				return null;
 			} finally {
 				TaskExecuted?.Invoke(this, null);
@@ -135,10 +135,10 @@ namespace Cyc.GoogleApi {
 				RegisterUser(userId, credential);
 				return userId;
 			} catch (TokenResponseException ex) {
-				logger.Log(ex);
+				logger?.Log(ex);
 				return null;
 			} catch (OperationCanceledException ex) {
-				logger.Log(ex);
+				logger?.Log(ex);
 				return null;
 			} finally {
 				TaskExecuted?.Invoke(this, null);
@@ -151,7 +151,7 @@ namespace Cyc.GoogleApi {
 		}
 		public async Task<bool> UserLogoutAsync(string userId) {
 			if (!userRegistry.ContainsKey(userId)) {
-				logger.Log("User has not been registered.");
+				logger?.Log("User has not been registered.");
 				return false;
 			}
 			BeforeTaskExecute?.Invoke(this, null);
@@ -185,7 +185,7 @@ namespace Cyc.GoogleApi {
 				.ConfigureAwait(false);
 			if (string.IsNullOrEmpty(response.Code)) {
 				var errorResponse = new TokenErrorResponse(response);
-				logger.Log($"Received an error. The response is: {errorResponse}");
+				logger?.Log($"Received an error. The response is: {errorResponse}");
 				throw new TokenResponseException(errorResponse);
 			}
 			var token = await app.Flow.ExchangeCodeForTokenAsync("user", response.Code, redirectUri,
