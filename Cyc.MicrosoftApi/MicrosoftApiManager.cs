@@ -41,6 +41,7 @@ namespace Cyc.MicrosoftApi {
 			public const string Comsumers = "https://login.microsoftonline.com/comsumers";
 			public const string Common = "https://login.microsoftonline.com/common";
 		}
+
 		public static class RedirectUrl {
 			public const string LocalHost = "http://localhost";
 			public const string NativeClient = "https://login.microsoftonline.com/common/oauth2/nativeclient";
@@ -136,6 +137,26 @@ namespace Cyc.MicrosoftApi {
 				yield return result;
 			}
 			TaskExecuted?.Invoke(this, null);
+		}
+		public async Task<AuthenticationResult> LoginInteractively(CancellationToken token)
+		{
+			BeforeTaskExecuted?.Invoke(this, null);
+			var requestBuilder = msalClient.AcquireTokenInteractive(scopes);
+			try {
+				var result = await requestBuilder
+					.ExecuteAsync(token)
+					.ConfigureAwait(false);
+				RegisterUser(result?.Account);
+				return result;
+			} catch (MsalClientException) {
+				Console.WriteLine("User cancelled");
+			} catch (MsalException ex) {
+				Console.WriteLine(ex.Message);
+			} catch (InvalidOperationException ex) {
+				logger?.Log(ex);
+			}
+			TaskExecuted?.Invoke(this, null);
+			return null;
 		}
 		public async Task<AuthenticationResult> LoginInteractively(IAccount account = null, string claims = null) {
 			BeforeTaskExecuted?.Invoke(this, null);

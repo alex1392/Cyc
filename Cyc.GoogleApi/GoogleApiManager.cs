@@ -20,7 +20,7 @@ using System.Threading.Tasks;
 using File = Google.Apis.Drive.v3.Data.File;
 namespace Cyc.GoogleApi {
 	public class GoogleApiManager {
-		private class Timeouts {
+		public class Timeouts {
 			public static readonly TimeSpan Silent = TimeSpan.FromSeconds(10);
 			public static readonly TimeSpan Interactive = TimeSpan.FromMinutes(1);
 		}
@@ -97,7 +97,8 @@ namespace Cyc.GoogleApi {
 			TaskExecuted?.Invoke(this, null);
 			return;
 		}
-		public async Task<string> UserLoginAsync() {
+		public async Task<string> UserLoginAsync()
+		{
 			BeforeTaskExecute?.Invoke(this, null);
 			var userId = Guid.NewGuid().ToString();
 			using var stream = new FileStream(ClientSecretsPath, FileMode.Open, FileAccess.Read);
@@ -108,6 +109,29 @@ namespace Cyc.GoogleApi {
 					Scopes,
 					userId,
 					cts.Token,
+					new FileDataStore(DataStorePath)).ConfigureAwait(false);
+				RegisterUser(userId, credential);
+				return userId;
+			} catch (TokenResponseException ex) {
+				logger?.Log(ex);
+				return null;
+			} catch (OperationCanceledException) {
+				//logger?.Log(ex); // do not show message, let the task expires automatically
+				return null;
+			} finally {
+				TaskExecuted?.Invoke(this, null);
+			}
+		}
+		public async Task<string> UserLoginAsync(CancellationToken token) {
+			BeforeTaskExecute?.Invoke(this, null);
+			var userId = Guid.NewGuid().ToString();
+			using var stream = new FileStream(ClientSecretsPath, FileMode.Open, FileAccess.Read);
+			try {
+				var credential = await GoogleWebAuthorizationBroker.AuthorizeAsync(
+					GoogleClientSecrets.Load(stream).Secrets,
+					Scopes,
+					userId,
+					token,
 					new FileDataStore(DataStorePath)).ConfigureAwait(false);
 				RegisterUser(userId, credential);
 				return userId;
