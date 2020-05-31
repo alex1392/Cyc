@@ -33,16 +33,19 @@ namespace Cyc.GoogleApi {
 		public string[] Scopes { get; set; } = new[] { DriveService.Scope.Drive };
 		public string ClientSecretsPath { get; set; } = @"GoogleApi\client_secret.json";
 		public string DataStorePath { get; private set; } = GoogleWebAuthorizationBroker.Folder;
-		public bool HasUser(string userId) {
+		public bool HasUser(string userId)
+		{
 			return userRegistry.ContainsKey(userId);
 		}
-		public GoogleApiManager(ILogger logger, string clientSecretsPath = null, string[] scopes = null, string dataStorePath = null) {
+		public GoogleApiManager(ILogger logger, string clientSecretsPath = null, string[] scopes = null, string dataStorePath = null)
+		{
 			ClientSecretsPath = clientSecretsPath ?? ClientSecretsPath;
 			Scopes = scopes ?? Scopes;
 			DataStorePath = dataStorePath ?? DataStorePath;
 			this.logger = logger;
 		}
-		public async Task<About> GetAboutAsync(string userId) {
+		public async Task<About> GetAboutAsync(string userId)
+		{
 			if (!userRegistry.ContainsKey(userId)) {
 				logger?.Log("User has not been registered.");
 				return null;
@@ -50,11 +53,19 @@ namespace Cyc.GoogleApi {
 			BeforeTaskExecute?.Invoke(this, null);
 			var request = userRegistry[userId].driveService.About.Get();
 			request.Fields = "user";
-			var about = await request.ExecuteAsync().ConfigureAwait(false);
-			TaskExecuted?.Invoke(this, null);
-			return about;
+			try {
+				var about = await request.ExecuteAsync().ConfigureAwait(false);
+				return about;
+
+			} catch (TokenResponseException ex) {
+				logger?.Log(ex);
+				return null;
+			} finally {
+				TaskExecuted?.Invoke(this, null);
+			}
 		}
-		public async Task<File> GetDriveRootAsync(string userId) {
+		public async Task<File> GetDriveRootAsync(string userId)
+		{
 			if (!userRegistry.ContainsKey(userId)) {
 				logger?.Log("User has not been registered.");
 				return null;
@@ -62,11 +73,20 @@ namespace Cyc.GoogleApi {
 			BeforeTaskExecute?.Invoke(this, null);
 			var request = userRegistry[userId].driveService.Files.Get("root");
 			request.Fields = "*";
-			var root = await request.ExecuteAsync().ConfigureAwait(false);
-			TaskExecuted?.Invoke(this, null);
-			return root;
+			try {
+				var root = await request.ExecuteAsync().ConfigureAwait(false);
+				return root;
+
+			} catch (TokenResponseException ex) {
+				logger?.Log(ex);
+				return null;
+			} finally {
+				TaskExecuted?.Invoke(this, null);
+
+			}
 		}
-		public async IAsyncEnumerable<File> GetChildrenAsync(string userId, string id) {
+		public async IAsyncEnumerable<File> GetChildrenAsync(string userId, string id)
+		{
 			if (!userRegistry.ContainsKey(userId)) {
 				logger?.Log("User has not been registered.");
 				yield break;
@@ -75,8 +95,19 @@ namespace Cyc.GoogleApi {
 			var request = userRegistry[userId].driveService.Files.List();
 			request.Q = $"parents in '{id}' and trashed = false";
 			request.Fields = "*";
+			FileList fileList;
 			do {
-				var fileList = await request.ExecuteAsync().ConfigureAwait(false);
+
+				try {
+					fileList = await request.ExecuteAsync().ConfigureAwait(false);
+
+				} catch (TokenResponseException ex) {
+					logger?.Log(ex);
+					yield break;
+				} finally {
+					TaskExecuted?.Invoke(this, null);
+
+				}
 				foreach (var file in fileList.Files) {
 					yield return file;
 				}
@@ -84,7 +115,8 @@ namespace Cyc.GoogleApi {
 			} while (!string.IsNullOrEmpty(request.PageToken));
 			TaskExecuted?.Invoke(this, null);
 		}
-		public async Task DownloadAsync(string userId, string fileId, string localPath, Action<IDownloadProgress> progressChanged = null) {
+		public async Task DownloadAsync(string userId, string fileId, string localPath, Action<IDownloadProgress> progressChanged = null)
+		{
 			if (!userRegistry.ContainsKey(userId)) {
 				logger?.Log("User has not been registered.");
 				return;
@@ -93,9 +125,13 @@ namespace Cyc.GoogleApi {
 			var request = userRegistry[userId].driveService.Files.Get(fileId);
 			request.MediaDownloader.ProgressChanged += progressChanged;
 			using var stream = new FileStream(localPath, FileMode.OpenOrCreate, FileAccess.Write);
-			await request.DownloadAsync(stream).ConfigureAwait(false);
-			TaskExecuted?.Invoke(this, null);
-			return;
+			try {
+				await request.DownloadAsync(stream).ConfigureAwait(false);
+			} catch (TokenResponseException ex) {
+				logger?.Log(ex);
+			} finally {
+				TaskExecuted?.Invoke(this, null);
+			}
 		}
 		public async Task<string> UserLoginAsync()
 		{
@@ -122,7 +158,8 @@ namespace Cyc.GoogleApi {
 				TaskExecuted?.Invoke(this, null);
 			}
 		}
-		public async Task<string> UserLoginAsync(CancellationToken token) {
+		public async Task<string> UserLoginAsync(CancellationToken token)
+		{
 			BeforeTaskExecute?.Invoke(this, null);
 			var userId = Guid.NewGuid().ToString();
 			using var stream = new FileStream(ClientSecretsPath, FileMode.Open, FileAccess.Read);
@@ -145,7 +182,8 @@ namespace Cyc.GoogleApi {
 				TaskExecuted?.Invoke(this, null);
 			}
 		}
-		public async Task<string> UserLoginAsync(string userId) {
+		public async Task<string> UserLoginAsync(string userId)
+		{
 			BeforeTaskExecute?.Invoke(this, null);
 			using var stream = new FileStream(ClientSecretsPath, FileMode.Open, FileAccess.Read);
 			try {
@@ -168,12 +206,14 @@ namespace Cyc.GoogleApi {
 				TaskExecuted?.Invoke(this, null);
 			}
 		}
-		public IEnumerable<string> LoadAllUserId() {
+		public IEnumerable<string> LoadAllUserId()
+		{
 			var datastore = new FileDataStore(DataStorePath);
 			var filepaths = Directory.GetFiles(datastore.FolderPath);
 			return filepaths.Select(path => string.Concat(path.SkipWhile(c => c != '-')).Remove(0, 1));
 		}
-		public async Task<bool> UserLogoutAsync(string userId) {
+		public async Task<bool> UserLogoutAsync(string userId)
+		{
 			if (!userRegistry.ContainsKey(userId)) {
 				logger?.Log("User has not been registered.");
 				return false;
@@ -187,7 +227,8 @@ namespace Cyc.GoogleApi {
 			TaskExecuted?.Invoke(this, null);
 			return result;
 		}
-		private void RegisterUser(string userId, UserCredential credential) {
+		private void RegisterUser(string userId, UserCredential credential)
+		{
 			var service = new DriveService(new BaseClientService.Initializer
 			{
 				HttpClientInitializer = credential,
@@ -201,7 +242,8 @@ namespace Cyc.GoogleApi {
 			}
 		}
 		[Obsolete]
-		private async Task<UserCredential> GetUserCredentialInteractivelyAsync(string path, IEnumerable<string> scopes) {
+		private async Task<UserCredential> GetUserCredentialInteractivelyAsync(string path, IEnumerable<string> scopes)
+		{
 			var app = GetAuthorizationCodeInstalledApp(path, scopes);
 			var redirectUri = app.CodeReceiver.RedirectUri;
 			var codeRequest = app.Flow.CreateAuthorizationCodeRequest(redirectUri);
@@ -217,7 +259,8 @@ namespace Cyc.GoogleApi {
 			return new UserCredential(app.Flow, "user", token);
 		}
 		[Obsolete]
-		private async Task<UserCredential> UserLoginSilently(string userId) {
+		private async Task<UserCredential> UserLoginSilently(string userId)
+		{
 			var app = GetAuthorizationCodeInstalledApp(ClientSecretsPath, Scopes);
 			using var cts = new CancellationTokenSource(Timeouts.Silent);
 			var token = await app.Flow.LoadTokenAsync(userId, cts.Token).ConfigureAwait(false);
@@ -227,7 +270,8 @@ namespace Cyc.GoogleApi {
 			return new UserCredential(app.Flow, userId, token);
 		}
 		[Obsolete]
-		private static AuthorizationCodeInstalledApp GetAuthorizationCodeInstalledApp(string path, IEnumerable<string> scopes) {
+		private static AuthorizationCodeInstalledApp GetAuthorizationCodeInstalledApp(string path, IEnumerable<string> scopes)
+		{
 			var stream = new FileStream(path, FileMode.Open, FileAccess.Read);
 			var initializer = new GoogleAuthorizationCodeFlow.Initializer
 			{
