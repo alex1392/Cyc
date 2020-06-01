@@ -51,6 +51,7 @@
     <Compile Include="Commands\EventToCommand.cs" />
     <Compile Include="Commands\IEventArgsConverter.cs" />
     <Compile Include="Commands\Interactivity.cs" />
+    <Compile Include="Converters\MathConverter.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
