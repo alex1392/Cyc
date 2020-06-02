@@ -1,0 +1,275 @@
+﻿<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:local="clr-namespace:Cyc.FluentDesign"
+                    xmlns:cyc="clr-namespace:Cyc"
+                    xmlns:sys="clr-namespace:System;assembly=mscorlib">
+
+  <sys:Double x:Key="backgroundMaxOpacity">0.5</sys:Double>
+  <sys:Double x:Key="hoverLightMaxOpacity">0.5</sys:Double>
+  <sys:Double x:Key="borderLightNormalOpacity">0.5</sys:Double>
+  <sys:Double x:Key="borderLightMaxOpacity">1</sys:Double>
+  <sys:Double x:Key="pressLightMaxOpacity">0.5</sys:Double>
+
+  <DoubleAnimation x:Key="MaxBorderLightAnimation"
+                   Storyboard.TargetName="borderLight"
+                   Storyboard.TargetProperty="(UIElement.Opacity)"
+                   To="{StaticResource borderLightMaxOpacity}"
+                   Duration="0:0:0.100">
+    <DoubleAnimation.EasingFunction>
+      <CubicEase EasingMode="EaseOut" />
+    </DoubleAnimation.EasingFunction>
+  </DoubleAnimation>
+  <DoubleAnimation x:Key="MaxHoverLightAnimation"
+                   Storyboard.TargetName="hoverLight"
+                   Storyboard.TargetProperty="(UIElement.Opacity)"
+                   To="{StaticResource hoverLightMaxOpacity}"
+                   Duration="0:0:0.600">
+    <DoubleAnimation.EasingFunction>
+      <CubicEase EasingMode="EaseOut" />
+    </DoubleAnimation.EasingFunction>
+  </DoubleAnimation>
+  <Storyboard x:Key="CheckedStoryboard">
+    <ObjectAnimationUsingKeyFrames Storyboard.TargetName="focusBorder"
+                                   Storyboard.TargetProperty="(UIElement.Visibility)">
+      <DiscreteObjectKeyFrame KeyTime="00:00:00"
+                              Value="{x:Static Visibility.Visible}" />
+    </ObjectAnimationUsingKeyFrames>
+
+    <DoubleAnimation Storyboard.TargetName="background"
+                     Storyboard.TargetProperty="(UIElement.Opacity)"
+                     To="{StaticResource backgroundMaxOpacity}"
+                     Duration="0:0:0.600">
+      <DoubleAnimation.EasingFunction>
+        <CubicEase EasingMode="EaseOut" />
+      </DoubleAnimation.EasingFunction>
+    </DoubleAnimation>
+  </Storyboard>
+  <Storyboard x:Key="UncheckedStoryboard">
+    <ObjectAnimationUsingKeyFrames Storyboard.TargetName="focusBorder"
+                                   Storyboard.TargetProperty="(UIElement.Visibility)">
+      <DiscreteObjectKeyFrame KeyTime="00:00:00"
+                              Value="{x:Static Visibility.Collapsed}" />
+    </ObjectAnimationUsingKeyFrames>
+
+    <DoubleAnimation Storyboard.TargetName="background"
+                     Storyboard.TargetProperty="(UIElement.Opacity)"
+                     To="0"
+                     Duration="0:0:0.600">
+      <DoubleAnimation.EasingFunction>
+        <CubicEase EasingMode="EaseOut" />
+      </DoubleAnimation.EasingFunction>
+    </DoubleAnimation>
+  </Storyboard>
+
+  <Style x:Key="RevealButtonBaseStyle"
+         TargetType="ButtonBase">
+    <Setter Property="Foreground"
+            Value="White" />
+    <Setter Property="Background"
+            Value="Transparent" />
+    <Setter Property="BorderThickness"
+            Value="4" />
+    <Setter Property="HorizontalContentAlignment"
+            Value="Center" />
+    <Setter Property="VerticalContentAlignment"
+            Value="Center" />
+    <Setter Property="UseLayoutRounding"
+            Value="True" />
+    <Setter Property="FocusVisualStyle"
+            Value="{x:Null}" />
+    
+    <Setter Property="Template">
+      <Setter.Value>
+        <ControlTemplate TargetType="ButtonBase">
+          <Grid x:Name="root">
+            <Border x:Name="borderLight"
+                    BorderThickness="{TemplateBinding BorderThickness}"
+                    Visibility="{Binding RelativeSource={RelativeSource TemplatedParent}, Path=(local:PointerTracker.EnableBorderLight), Converter={cyc:VisibilityConverter}}"
+                    Opacity="{StaticResource borderLightNormalOpacity}"
+                    BorderBrush="{local:RevealBrush}" />
+            <Border x:Name="focusBorder"
+                    BorderThickness="{TemplateBinding BorderThickness}"
+                    Visibility="Collapsed"
+                    BorderBrush="{local:TemplatedSolidBrush}"
+                    Opacity="{StaticResource borderLightNormalOpacity}">
+              <Border x:Name="background"
+                      Opacity="0"
+                      Visibility="{Binding RelativeSource={RelativeSource TemplatedParent}, Path=(local:PointerTracker.EnableBackgroundColor), Converter={cyc:VisibilityConverter}}"
+                      Background="{local:TemplatedSolidBrush}" />
+            </Border>
+
+            <Border x:Name="revealBorder"
+                    BorderThickness="{TemplateBinding BorderThickness}">
+              <Grid>
+                <Border x:Name="hoverLight"
+                        Opacity="0"
+                        Visibility="{Binding RelativeSource={RelativeSource TemplatedParent}, Path=(local:PointerTracker.EnableHoverLight), Converter={cyc:VisibilityConverter}}"
+                        Background="{local:RevealBrush}" />
+                <Rectangle x:Name="pressLight"
+                           Opacity="0"
+                           Visibility="{Binding RelativeSource={RelativeSource TemplatedParent}, Path=(local:PointerTracker.EnablePressLight), Converter={cyc:VisibilityConverter}}">
+                  <Rectangle.Fill>
+                    <RadialGradientBrush x:Name="pressLightBrush"
+                                         MappingMode="Absolute"
+                                         RadiusY="{Binding ElementName=pressLightAnimationBinder, Path=Width}"
+                                         RadiusX="{Binding ElementName=pressLightAnimationBinder, Path=Width}"
+                                         Opacity="{Binding RelativeSource={RelativeSource TemplatedParent}, Path=(local:PointerTracker.TrackerOpacity)}">
+                      <RadialGradientBrush.Center>
+                        <MultiBinding Converter="{local:RelativePositionConverter}">
+                          <Binding RelativeSource="{RelativeSource TemplatedParent}"
+                                   Path="(local:PointerTracker.RootObject)" />
+                          <Binding RelativeSource="{RelativeSource TemplatedParent}" />
+                          <Binding RelativeSource="{RelativeSource TemplatedParent}"
+                                   Path="(local:PointerTracker.Position)" />
+                        </MultiBinding>
+                      </RadialGradientBrush.Center>
+                      <RadialGradientBrush.GradientOrigin>
+                        <MultiBinding Converter="{local:RelativePositionConverter}">
+                          <Binding RelativeSource="{RelativeSource TemplatedParent}"
+                                   Path="(local:PointerTracker.RootObject)" />
+                          <Binding RelativeSource="{RelativeSource TemplatedParent}" />
+                          <Binding RelativeSource="{RelativeSource TemplatedParent}"
+                                   Path="(local:PointerTracker.Position)" />
+                        </MultiBinding>
+                      </RadialGradientBrush.GradientOrigin>
+                      <GradientStop Offset="0"
+                                    Color="Transparent" />
+                      <GradientStop Offset="0.5"
+                                    Color="{Binding RelativeSource={RelativeSource TemplatedParent}, Path=(local:PointerTracker.TrackerColor)}" />
+                      <GradientStop Offset="1"
+                                    Color="Transparent" />
+                    </RadialGradientBrush>
+                  </Rectangle.Fill>
+                </Rectangle>
+              </Grid>
+            </Border>
+
+            <Border x:Name="ContentBorder"
+                    BorderBrush="{x:Null}"
+                    BorderThickness="{TemplateBinding BorderThickness}">
+              <ContentPresenter x:Name="contentPresenter"
+                                Focusable="False"
+                                HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"
+                                VerticalAlignment="{TemplateBinding VerticalContentAlignment}"
+                                Margin="{TemplateBinding Padding}"
+                                RecognizesAccessKey="True"
+                                SnapsToDevicePixels="{TemplateBinding SnapsToDevicePixels}" />
+            </Border>
+
+            <!--Animate from 0 to 1-->
+            <FrameworkElement x:Name="pressLightAnimationDummy"
+                              Width="0" />
+            <FrameworkElement x:Name="pressLightAnimationBinder">
+              <FrameworkElement.Width>
+                <!--From A=500 to B=50, {0 => 1} * (B - A) + A -->
+                <MultiBinding Converter="{cyc:MathConverter}"
+                              ConverterParameter="[0] * ([1] / 2 - 500) + 500 ">
+                  <Binding ElementName="pressLightAnimationDummy"
+                           Path="Width" />
+                  <Binding RelativeSource="{RelativeSource TemplatedParent}"
+                           Path="(local:PointerTracker.TrackerSize)" />
+                </MultiBinding>
+              </FrameworkElement.Width>
+            </FrameworkElement>
+
+            <VisualStateManager.VisualStateGroups>
+              <VisualStateGroup x:Name="CommonStates">
+                <VisualState x:Name="Normal" />
+                <VisualState x:Name="MouseOver">
+                  <Storyboard>
+                    <StaticResourceExtension ResourceKey="MaxBorderLightAnimation" />
+                    <StaticResourceExtension ResourceKey="MaxHoverLightAnimation" />
+                  </Storyboard>
+                </VisualState>
+                <VisualState x:Name="Pressed">
+                  <Storyboard>
+                    <StaticResourceExtension ResourceKey="MaxBorderLightAnimation" />
+                    <StaticResourceExtension ResourceKey="MaxHoverLightAnimation" />
+
+                    <DoubleAnimation Storyboard.TargetName="pressLight"
+                                     Storyboard.TargetProperty="(UIElement.Opacity)"
+                                     To="{StaticResource pressLightMaxOpacity}"
+                                     Duration="0:0:0.100">
+                      <DoubleAnimation.EasingFunction>
+                        <CubicEase EasingMode="EaseOut" />
+                      </DoubleAnimation.EasingFunction>
+                    </DoubleAnimation>
+                    <DoubleAnimation Storyboard.TargetName="pressLight"
+                                     Storyboard.TargetProperty="Opacity"
+                                     To="0"
+                                     BeginTime="0:0:0.500"
+                                     Duration="0:0:4.000">
+                      <DoubleAnimation.EasingFunction>
+                        <SineEase EasingMode="EaseInOut" />
+                      </DoubleAnimation.EasingFunction>
+                    </DoubleAnimation>
+
+                    <DoubleAnimation Storyboard.TargetName="pressLightAnimationDummy"
+                                     Storyboard.TargetProperty="Width"
+                                     From="0"
+                                     To="1"
+                                     Duration="0:0:0.300">
+                      <DoubleAnimation.EasingFunction>
+                        <CubicEase EasingMode="EaseOut" />
+                      </DoubleAnimation.EasingFunction>
+                    </DoubleAnimation>
+                    <DoubleAnimation Storyboard.TargetName="pressLightAnimationDummy"
+                                     Storyboard.TargetProperty="Width"
+                                     To="0"
+                                     BeginTime="0:0:0.500"
+                                     Duration="0:0:1.000">
+                      <DoubleAnimation.EasingFunction>
+                        <CubicEase EasingMode="EaseInOut" />
+                      </DoubleAnimation.EasingFunction>
+                    </DoubleAnimation>
+                  </Storyboard>
+                </VisualState>
+                <VisualState x:Name="Disabled">
+                  <Storyboard>
+                    <ColorAnimation Storyboard.TargetName="contentPresenter"
+                                    Storyboard.TargetProperty="(TextElement.Foreground).(SolidColorBrush.Color)"
+                                    To="#FF838383"
+                                    Duration="0:0:0.100"
+                                    AutoReverse="False">
+                      <ColorAnimation.EasingFunction>
+                        <SineEase EasingMode="EaseInOut" />
+                      </ColorAnimation.EasingFunction>
+                    </ColorAnimation>
+                    <DoubleAnimation Storyboard.TargetName="borderLight"
+                                     Storyboard.TargetProperty="Opacity"
+                                     To="0"
+                                     Duration="0:0:0.100"
+                                     AutoReverse="False">
+                      <DoubleAnimation.EasingFunction>
+                        <SineEase EasingMode="EaseInOut" />
+                      </DoubleAnimation.EasingFunction>
+                    </DoubleAnimation>
+                  </Storyboard>
+                </VisualState>
+              </VisualStateGroup>
+              <VisualStateGroup x:Name="FocusStates">
+                <VisualState x:Name="Focused">
+                  <StaticResourceExtension ResourceKey="CheckedStoryboard" />
+                </VisualState>
+                <VisualState x:Name="Unfocused">
+                  <StaticResourceExtension ResourceKey="UncheckedStoryboard" />
+                </VisualState>
+              </VisualStateGroup>
+              <VisualStateGroup x:Name="CheckStates">
+                <VisualState x:Name="Checked">
+                  <StaticResourceExtension ResourceKey="CheckedStoryboard" />
+                </VisualState>
+                <VisualState x:Name="Unchecked">
+                  <StaticResourceExtension ResourceKey="UncheckedStoryboard" />
+                </VisualState>
+              </VisualStateGroup>
+
+            </VisualStateManager.VisualStateGroups>
+          </Grid>
+
+        </ControlTemplate>
+      </Setter.Value>
+    </Setter>
+  </Style>
+
+</ResourceDictionary>

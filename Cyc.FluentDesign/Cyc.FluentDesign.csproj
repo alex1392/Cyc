@@ -1,10 +1,10 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>bf1f329d-2a66-48f8-bd93-96f95c9024f8</ProjectGuid>
+    <ProjectGuid>{BF1F329D-2A66-48F8-BD93-96F95C9024F8}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>Cyc.FluentDesign</RootNamespace>
@@ -18,7 +18,8 @@
     <DebugType>full</DebugType>
     <Optimize>false</Optimize>
     <OutputPath>bin\Debug\</OutputPath>
-    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <DefineConstants>
+    </DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
@@ -31,24 +32,132 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="System"/>
-    
-    <Reference Include="System.Core"/>
-    <Reference Include="System.Xml.Linq"/>
-    <Reference Include="System.Data.DataSetExtensions"/>
-    
-    
-    <Reference Include="Microsoft.CSharp"/>
-    
-    <Reference Include="System.Data"/>
-    
-    <Reference Include="System.Net.Http"/>
-    
-    <Reference Include="System.Xml"/>
+    <Reference Include="Microsoft.Xaml.Behaviors, Version=1.1.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
+      <HintPath>..\..\packages\Microsoft.Xaml.Behaviors.Wpf.1.1.19\lib\net45\Microsoft.Xaml.Behaviors.dll</HintPath>
+    </Reference>
+    <Reference Include="PresentationCore" />
+    <Reference Include="PresentationFramework" />
+    <Reference Include="System" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Drawing" />
+    <Reference Include="System.Management" />
+    <Reference Include="System.Windows.Forms" />
+    <Reference Include="System.Xaml" />
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="System.Data.DataSetExtensions" />
+    <Reference Include="Microsoft.CSharp" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Net.Http" />
+    <Reference Include="System.Xml" />
+    <Reference Include="WindowsBase" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Class1.cs" />
+    <Compile Include="AcrylicBrush.cs" />
+    <Compile Include="Animations\BrushAnimation.cs" />
+    <Compile Include="Converters\OpacityConverter.cs" />
+    <Compile Include="Converters\RelativePositionConverter.cs" />
+    <Compile Include="CustomControls\AcrylicContextMenu.cs" />
+    <Compile Include="CustomControls\AcrylicPanel.cs" />
+    <Compile Include="CustomControls\AcrylicPopup.cs" />
+    <Compile Include="CustomControls\AcrylicWindow.cs" />
+    <Compile Include="CustomControls\ParallaxView.cs" />
+    <Compile Include="CustomControls\RevealButton.cs" />
+    <Compile Include="CustomControls\RevealWindow.cs" />
+    <Compile Include="DropShadowPanel.cs" />
+    <Compile Include="Extensions.cs" />
+    <Compile Include="Externals\ComboConverterBase.cs" />
+    <Compile Include="Externals\ConverterMarkup.cs" />
+    <Compile Include="Externals\CustomWindowBase.cs" />
+    <Compile Include="Externals\CycResources.cs" />
+    <Compile Include="Externals\ImageConverters.cs" />
+    <Compile Include="Externals\IViewValidation.cs" />
+    <Compile Include="Externals\MathConverter.cs" />
+    <Compile Include="Externals\MultiValueConverterBase .cs" />
+    <Compile Include="Externals\ObservableObject.cs" />
+    <Compile Include="Externals\ObservableWindow.cs" />
+    <Compile Include="Externals\Pointer.cs" />
+    <Compile Include="Externals\RelayCommand.cs" />
+    <Compile Include="Externals\RelayCommandBase.cs" />
+    <Compile Include="Externals\StaticPropertyChangedEventArgs.cs" />
+    <Compile Include="Externals\ValueConverterBase.cs" />
+    <Compile Include="Externals\ViewModelBase.cs" />
+    <Compile Include="Externals\VisibilityConverter.cs" />
+    <Compile Include="Externals\Win32MessageIDs.cs" />
+    <Compile Include="Externals\WindowServices.cs" />
+    <Compile Include="Markups\RevealBrush.cs" />
+    <Compile Include="Markups\TemplatedSolidBrush.cs" />
+    <Compile Include="PointerTracker.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Resources\AccentColors.cs" />
+    <Compile Include="Resources\ResourceDictionaryEx.cs" />
+    <Compile Include="Resources\SystemTheme.cs" />
+    <Compile Include="Resources\ThemeHandler.cs" />
+    <Compile Include="Utility\AcrylicHelper.cs" />
+    <Compile Include="Utility\SystemInfo.cs" />
+    <Compile Include="Utility\VersionInfo.cs" />
+    <Compile Include="Utility\VersionInfos.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Assets\Images\noise.png" />
+    <Resource Include="Assets\Images\noiseBlack.png" />
+    <Resource Include="Assets\Images\noiseWhite.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="packages.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <Page Include="Styles\Brushes.xaml">
+      <SubType>Designer</SubType>
+      <Generator>XamlIntelliSenseFileGenerator</Generator>
+    </Page>
+    <Page Include="Styles\Colors.Dark.xaml">
+      <SubType>Designer</SubType>
+      <Generator>XamlIntelliSenseFileGenerator</Generator>
+    </Page>
+    <Page Include="Styles\Colors.Light.xaml">
+      <SubType>Designer</SubType>
+      <Generator>XamlIntelliSenseFileGenerator</Generator>
+    </Page>
+    <Page Include="Styles\Colors.xaml">
+      <SubType>Designer</SubType>
+      <Generator>XamlIntelliSenseFileGenerator</Generator>
+    </Page>
+    <Page Include="Styles\Controls.xaml">
+      <SubType>Designer</SubType>
+      <Generator>XamlIntelliSenseFileGenerator</Generator>
+    </Page>
+    <Page Include="Styles\Menu.xaml">
+      <SubType>Designer</SubType>
+      <Generator>XamlIntelliSenseFileGenerator</Generator>
+    </Page>
+    <Page Include="Styles\ScrollBar.xaml">
+      <SubType>Designer</SubType>
+      <Generator>XamlIntelliSenseFileGenerator</Generator>
+    </Page>
+    <Page Include="Styles\Tooltip.xaml">
+      <SubType>Designer</SubType>
+      <Generator>XamlIntelliSenseFileGenerator</Generator>
+    </Page>
+    <Page Include="Styles\Window.xaml">
+      <SubType>Designer</SubType>
+      <Generator>XamlIntelliSenseFileGenerator</Generator>
+    </Page>
+    <Page Include="Themes\Generic.xaml">
+      <SubType>Designer</SubType>
+      <Generator>XamlIntelliSenseFileGenerator</Generator>
+    </Page>
+    <Page Include="Themes\RevealButton.xaml">
+      <SubType>Designer</SubType>
+      <Generator>XamlIntelliSenseFileGenerator</Generator>
+    </Page>
+    <Page Include="Themes\RevealButtonBase.xaml">
+      <SubType>Designer</SubType>
+      <Generator>XamlIntelliSenseFileGenerator</Generator>
+    </Page>
+    <Page Include="Themes\RevealWindow.xaml">
+      <SubType>Designer</SubType>
+      <Generator>XamlIntelliSenseFileGenerator</Generator>
+    </Page>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
- </Project>
+</Project>
