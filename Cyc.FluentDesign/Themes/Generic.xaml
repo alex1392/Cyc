@@ -4,7 +4,8 @@
 	<ResourceDictionary.MergedDictionaries>
 		<ResourceDictionary Source="pack://application:,,,/Cyc.FluentDesign;component/Themes/RevealButton.xaml" />
     <ResourceDictionary Source="pack://application:,,,/Cyc.FluentDesign;component/Themes/RevealWindow.xaml" />
-  </ResourceDictionary.MergedDictionaries>
+		<ResourceDictionary Source="pack://application:,,,/Cyc.FluentDesign;component/Styles/Window.xaml" />
+	</ResourceDictionary.MergedDictionaries>
 
 
 

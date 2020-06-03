@@ -3,6 +3,7 @@
 										xmlns:local="clr-namespace:Cyc.FluentDesign"
 										xmlns:i="http://schemas.microsoft.com/xaml/behaviors"
 										xmlns:converter="clr-namespace:Cyc.FluentDesign.Converters"
+										xmlns:fw="clr-namespace:SourceChord.FluentWPF;assembly=FluentWPF"
 										xmlns:sys="clr-namespace:System;assembly=mscorlib">
 
 	<ResourceDictionary.MergedDictionaries>
@@ -99,14 +100,12 @@
 			</Path.RenderTransform>
 		</Path>
 	</DataTemplate>
-	
 
-	<Style TargetType="Window"
+
+	<Style TargetType="local:RevealWindow"
 				 x:Key="RevealWindowStyle">
 		<Setter Property="Foreground"
 						Value="{DynamicResource {x:Static SystemColors.WindowTextBrushKey}}" />
-		<Setter Property="Background"
-						Value="{DynamicResource {x:Static SystemColors.DesktopBrushKey}}" />
 		<Setter Property="BorderThickness"
 						Value="1" />
 		<Setter Property="BorderBrush"
