@@ -105,8 +105,16 @@
 				 x:Key="RevealWindowStyle">
 		<Setter Property="Foreground"
 						Value="{DynamicResource {x:Static SystemColors.WindowTextBrushKey}}" />
+		<Setter Property="Background"
+						Value="{DynamicResource {x:Static SystemColors.DesktopBrushKey}}" />
 		<Setter Property="BorderThickness"
 						Value="1" />
+		<Setter Property="BorderBrush"
+						Value="{DynamicResource {x:Static SystemColors.WindowFrameBrushKey}}" />
+		<Setter Property="WindowStyle"
+						Value="None" />
+		<Setter Property="AllowsTransparency"
+						Value="True" />
 		<Setter Property="IsTabStop"
 						Value="False" />
 		<Setter Property="ResizeMode"
@@ -119,7 +127,7 @@
 						Value="Segoe UI" />
 		<Setter Property="WindowChrome.WindowChrome">
 			<Setter.Value>
-				<WindowChrome ResizeBorderThickness="{x:Static SystemParameters.WindowResizeBorderThickness}"
+				<WindowChrome ResizeBorderThickness="6"
 											CaptionHeight="{StaticResource CaptionHeight}" />
 			</Setter.Value>
 		</Setter>
