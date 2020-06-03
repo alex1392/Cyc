@@ -3,12 +3,11 @@
                     xmlns:local="clr-namespace:Cyc.FluentDesign"
                     xmlns:i="http://schemas.microsoft.com/xaml/behaviors"
 										
-                    xmlns:cyc="clr-namespace:Cyc"
-                    xmlns:re="clr-namespace:Cyc.Resource"
+                    xmlns:converter="clr-namespace:Cyc.FluentDesign.Converters"
                     xmlns:sys="clr-namespace:System;assembly=mscorlib">
 
   <ResourceDictionary.MergedDictionaries>
-    <ResourceDictionary Source="RevealButtonBase.xaml" />
+    <ResourceDictionary Source="RevealButton.xaml" />
   </ResourceDictionary.MergedDictionaries>
 
   <Style x:Key="WindowButtonPathStyleBase"
@@ -41,28 +40,28 @@
             Value="Round" />
   </Style>
   <DataTemplate x:Key="RestoreIcon">
-    <Path Data="{x:Static re:CycResources.RestoreButtonGeometryData}"
-          Style="{StaticResource WindowButtonFillPathStyle}" />
+		<Path Data="M1,3 L1,11 L9,11 L9,3 z M3,1 L3,2 L10,2 L10,9 L11,9 L11,1 z M2 ,0 L12,0 L12,10 L10,10 L10,12 L0,12 L0,2 L2 ,2 z"
+					Style="{StaticResource WindowButtonFillPathStyle}" />
   </DataTemplate>
   <DataTemplate x:Key="CloseIcon">
-    <Path Data="{x:Static re:CycResources.CloseButtonGeometryData}"
-          Style="{StaticResource WindowButtonFillPathStyle}" />
+		<Path Data="M1,0 L6,5 L11,0 L12,1 L7,6 L12,11 L11,12 L6,7 L1,12 L0,11 L5,6 L0,1 z"
+					Style="{StaticResource WindowButtonFillPathStyle}" />
   </DataTemplate>
   <DataTemplate x:Key="MaximizeIcon">
-    <Path Data="{x:Static re:CycResources.MaximizeButtonGeometryData}"
-          Style="{StaticResource WindowButtonFillPathStyle}" />
+		<Path Data="M1,1  L1 ,11 L11,11 L11,1 z M0,0 L12,0 L12,12 L0,12 z"
+					Style="{StaticResource WindowButtonFillPathStyle}" />
   </DataTemplate>
   <DataTemplate x:Key="MinimizeIcon">
-    <Path Data="{x:Static re:CycResources.MinimizeButtonGeometryData}"
-          Style="{StaticResource WindowButtonFillPathStyle}" />
+		<Path Data="M0,5 L12,5 L12,6 L0,6 z"
+					Style="{StaticResource WindowButtonFillPathStyle}" />
   </DataTemplate>
   <DataTemplate x:Key="TopMostIcon">
-    <Path Data="{x:Static re:CycResources.TopmostButtonGeometryData}"
-          Style="{StaticResource WindowButtonStrokePathStyle}" />
+		<Path Data="M 6 12 L 6 2 L 10 6 M 6 12 L 6 2 L 2 6 M 2 1 L 10 1"
+					Style="{StaticResource WindowButtonStrokePathStyle}" />
   </DataTemplate>
   <DataTemplate x:Key="NotifyIcon">
-    <Path Data="{x:Static re:CycResources.NotifyIconButtonGeometryData}"
-          Style="{StaticResource WindowButtonStrokePathStyle}"
+		<Path Data="M 6 12 L 6 3 L 10 6 M 6 12 L 6 3 L 2 6 M 2 .5 L 10 .5 M 2 2 L 10 2"
+					Style="{StaticResource WindowButtonStrokePathStyle}"
           RenderTransformOrigin="0.5,0.5">
       <Path.RenderTransform>
         <RotateTransform Angle="180" />
@@ -71,226 +70,9 @@
   </DataTemplate>
   <sys:Double x:Key="CaptionHeight">26.5</sys:Double>
   <sys:Double x:Key="WindoeButtonWidth">40</sys:Double>
-  
-  <Style TargetType="{x:Type local:RevealWindow}">
-    <Setter Property="local:AcrylicWindow.Enabled"
-            Value="True" />
-    <Setter Property="local:AcrylicWindow.TintColor"
-            Value="Black" />
-    <Setter Property="local:AcrylicWindow.ShowTitleBar"
-            Value="False" />
-    <Setter Property="local:AcrylicWindow.FallbackColor"
-            Value="#99000000" />
-    <Setter Property="Foreground"
-            Value="{DynamicResource {x:Static SystemColors.WindowTextBrushKey}}" />
-    <Setter Property="BorderThickness"
-            Value="1" />
-    <Setter Property="IsTabStop"
-            Value="False" />
-    <Setter Property="ResizeMode"
-            Value="CanResizeWithGrip" />
-    <Setter Property="UseLayoutRounding"
-            Value="True" />
-    <Setter Property="TextOptions.TextFormattingMode"
-            Value="Display" />
-    <Setter Property="FontFamily"
-            Value="Segoe UI" />
-    <Setter Property="WindowChrome.WindowChrome">
-      <Setter.Value>
-        <WindowChrome ResizeBorderThickness="{x:Static SystemParameters.WindowResizeBorderThickness}"
-                      CaptionHeight="{StaticResource CaptionHeight}" />
-      </Setter.Value>
-    </Setter>
-    <Setter Property="Template">
-      <Setter.Value>
-        <ControlTemplate TargetType="{x:Type local:RevealWindow}">
-          <Border x:Name="WindowBorder"
-                  BorderBrush="{TemplateBinding BorderBrush}"
-                  Background="{TemplateBinding Background}"
-                  BorderThickness="{TemplateBinding BorderThickness}">
-            <DockPanel x:Name="LayoutRoot"
-                       Background="{TemplateBinding Background}">
-              <DockPanel x:Name="PART_WindowTitle"
-                         DockPanel.Dock="Top"
-                         Height="{StaticResource CaptionHeight}"
-                         Background="#BB000000"
-                         local:PointerTracker.Enabled="True"
-                         local:PointerTracker.TrackerSize="{StaticResource WindoeButtonWidth}"
-                         local:PointerTracker.TrackerOpacity="1">
-                <StackPanel Orientation="Horizontal"
-                            DockPanel.Dock="Left">
-                  <Button x:Name="IconButton"
-                          Content="{TemplateBinding Icon}"
-                          VerticalAlignment="Center"
-                          Margin="7,0,5,0"
-                          Height="{x:Static SystemParameters.SmallIconHeight}"
-                          Width="{x:Static SystemParameters.SmallIconWidth}"
-                          WindowChrome.IsHitTestVisibleInChrome="True"
-                          IsTabStop="False">
-                    <Button.Template>
-                      <ControlTemplate TargetType="{x:Type Button}">
-                        <Image Source="{TemplateBinding Content}" />
-                      </ControlTemplate>
-                    </Button.Template>
-                    <i:Interaction.Triggers>
-                      <i:EventTrigger EventName="Click">
-                        <i:InvokeCommandAction Command="{x:Static SystemCommands.ShowSystemMenuCommand}" />
-                      </i:EventTrigger>
-                      <i:EventTrigger EventName="MouseDoubleClick">
-                        <i:InvokeCommandAction Command="{x:Static SystemCommands.CloseWindowCommand}" />
-                      </i:EventTrigger>
-                    </i:Interaction.Triggers>
-                  </Button>
-                  <ContentControl x:Name="TitleControl"
-                                  IsTabStop="False"
-                                  Foreground="White"
-                                  HorizontalAlignment="Center"
-                                  VerticalAlignment="Center"
-                                  FontSize="{DynamicResource {x:Static SystemFonts.CaptionFontSize}}"
-                                  Content="{TemplateBinding Title}" />
-                </StackPanel>
-                <StackPanel x:Name="WindowButtonsStackPanel"
-                            DockPanel.Dock="Right"
-                            Orientation="Horizontal"
-                            FlowDirection="RightToLeft"
-                            HorizontalAlignment="Right"
-                            VerticalAlignment="Stretch"
-                            Background="Transparent"
-                            WindowChrome.IsHitTestVisibleInChrome="True">
-                  <StackPanel.Resources>
-                    <Style x:Key="TitleBarButtonStyle"
-                           TargetType="ButtonBase"
-                           BasedOn="{StaticResource RevealButtonBaseStyle}">
-                      <Setter Property="Focusable"
-                              Value="False" />
-                      <Setter Property="Background"
-                              Value="#66FFFFFF" />
-                      <Setter Property="Width"
-                              Value="{StaticResource WindoeButtonWidth}" />
-                      <Setter Property="HorizontalContentAlignment"
-                              Value="Center" />
-                      <Setter Property="VerticalContentAlignment"
-                              Value="Center" />
-                      <Setter Property="BorderThickness"
-                              Value="1" />
-                      <Setter Property="IsTabStop"
-                              Value="False" />
-                      <Setter Property="WindowChrome.IsHitTestVisibleInChrome"
-                              Value="True" />
-                    </Style>
-                    <Style TargetType="local:RevealButton"
-                           BasedOn="{StaticResource TitleBarButtonStyle}" />
-                    <Style TargetType="ToggleButton"
-                           BasedOn="{StaticResource TitleBarButtonStyle}" />
-                  </StackPanel.Resources>
-                  <local:RevealButton x:Name="CloseButton"
-                                      ToolTip="Close"
-                                      Command="{Binding Source={x:Static SystemCommands.CloseWindowCommand}}"
-                                      ContentTemplate="{StaticResource CloseIcon}" />
-                  <Grid>
-                    <local:RevealButton x:Name="RestoreButton"
-                                        ToolTip="Restore"
-                                        Command="{Binding Source={x:Static SystemCommands.RestoreWindowCommand}}"
-                                        ContentTemplate="{StaticResource RestoreIcon}"
-                                        Visibility="Collapsed" />
-                    <local:RevealButton x:Name="MaximizeButton"
-                                        ToolTip="Maximize"
-                                        Command="{Binding Source={x:Static SystemCommands.MaximizeWindowCommand}}"
-                                        ContentTemplate="{StaticResource MaximizeIcon}" />
-                  </Grid>
-                  <local:RevealButton x:Name="MinimizeButton"
-                                      ToolTip="Minimize"
-                                      Command="{Binding Source={x:Static SystemCommands.MinimizeWindowCommand}}"
-                                      ContentTemplate="{StaticResource MinimizeIcon}" />
-                  <ToggleButton x:Name="TopMostButton"
-                                ToolTip="Top Most Window"
-                                Width="40"
-                                IsChecked="{Binding RelativeSource={RelativeSource Mode=TemplatedParent}, Path=Topmost, Mode=TwoWay}"
-                                ContentTemplate="{StaticResource TopMostIcon}"
-                                Visibility="{Binding RelativeSource={RelativeSource TemplatedParent}, Path=EnableTopmostButton, Converter={cyc:VisibilityConverter}}" />
-                  <local:RevealButton x:Name="NotifyIconButton"
-                                      ToolTip="Minimize to notify icon"
-                                      ContentTemplate="{StaticResource NotifyIcon}"
-                                      Command="{Binding RelativeSource={RelativeSource TemplatedParent}, Path=NotifyIconCommand}"
-                                      Visibility="{Binding RelativeSource={RelativeSource TemplatedParent}, Path=EnableNotifyIconButton, Converter={cyc:VisibilityConverter}}" />
-                </StackPanel>
-              </DockPanel>
-              <AdornerDecorator Grid.Row="1"
-                                KeyboardNavigation.IsTabStop="False">
-                <ContentPresenter x:Name="MainContentPresenter"
-                                  KeyboardNavigation.TabNavigation="Cycle" />
-              </AdornerDecorator>
-              <ResizeGrip x:Name="ResizeGrip"
-                          HorizontalAlignment="Right"
-                          VerticalAlignment="Bottom"
-                          Grid.Row="1"
-                          IsTabStop="False"
-                          Visibility="Hidden"
-                          WindowChrome.ResizeGripDirection="BottomRight" />
-            </DockPanel>
-          </Border>
-          
-          <ControlTemplate.Triggers>
-            <Trigger Property="WindowState"
-                     Value="Maximized">
-              <Setter TargetName="MaximizeButton"
-                      Property="Visibility"
-                      Value="Collapsed" />
-              <Setter TargetName="RestoreButton"
-                      Property="Visibility"
-                      Value="Visible" />
-              <Setter TargetName="LayoutRoot"
-                      Property="Margin"
-                      Value="7" />
-            </Trigger>
-            <Trigger Property="WindowState"
-                     Value="Normal">
-              <Setter TargetName="MaximizeButton"
-                      Property="Visibility"
-                      Value="Visible" />
-              <Setter TargetName="RestoreButton"
-                      Property="Visibility"
-                      Value="Collapsed" />
-            </Trigger>
-            <Trigger Property="ResizeMode"
-                     Value="NoResize">
-              <Setter TargetName="MinimizeButton"
-                      Property="Visibility"
-                      Value="Collapsed" />
-              <Setter TargetName="MaximizeButton"
-                      Property="Visibility"
-                      Value="Collapsed" />
-              <Setter TargetName="RestoreButton"
-                      Property="Visibility"
-                      Value="Collapsed" />
-            </Trigger>
 
-            <MultiTrigger>
-              <MultiTrigger.Conditions>
-                <Condition Property="ResizeMode"
-                           Value="CanResizeWithGrip" />
-                <Condition Property="WindowState"
-                           Value="Normal" />
-              </MultiTrigger.Conditions>
-              <Setter TargetName="ResizeGrip"
-                      Property="Visibility"
-                      Value="Visible" />
-            </MultiTrigger>
-          </ControlTemplate.Triggers>
-        </ControlTemplate>
-      </Setter.Value>
-    </Setter>
-  </Style>
-
-	<Style TargetType="Window" x:Key="RevealWindowStyle">
-		<!--<Setter Property="local:AcrylicWindow.Enabled"
-						Value="True" />
-		<Setter Property="local:AcrylicWindow.TintColor"
-						Value="Black" />
-		<Setter Property="local:AcrylicWindow.ShowTitleBar"
-						Value="False" />
-		<Setter Property="local:AcrylicWindow.FallbackColor"
-						Value="#99000000" />-->
+	<Style TargetType="Window"
+				 x:Key="RevealWindowStyle">
 		<Setter Property="Foreground"
 						Value="{DynamicResource {x:Static SystemColors.WindowTextBrushKey}}" />
 		<Setter Property="BorderThickness"
@@ -370,7 +152,7 @@
 									<StackPanel.Resources>
 										<Style x:Key="TitleBarButtonStyle"
 													 TargetType="ButtonBase"
-													 BasedOn="{StaticResource RevealButtonBaseStyle}">
+													 BasedOn="{StaticResource RevealButtonStyle}">
 											<Setter Property="Focusable"
 															Value="False" />
 											<Setter Property="Background"
@@ -417,12 +199,12 @@
 																Width="40"
 																IsChecked="{Binding RelativeSource={RelativeSource Mode=TemplatedParent}, Path=Topmost, Mode=TwoWay}"
 																ContentTemplate="{StaticResource TopMostIcon}"
-																Visibility="{Binding RelativeSource={RelativeSource TemplatedParent}, Path=EnableTopmostButton, Converter={cyc:VisibilityConverter}}" />
+																Visibility="{Binding RelativeSource={RelativeSource TemplatedParent}, Path=EnableTopmostButton, Converter={converter:VisibilityConverter}}" />
 									<local:RevealButton x:Name="NotifyIconButton"
 																			ToolTip="Minimize to notify icon"
 																			ContentTemplate="{StaticResource NotifyIcon}"
 																			Command="{Binding RelativeSource={RelativeSource TemplatedParent}, Path=NotifyIconCommand}"
-																			Visibility="{Binding RelativeSource={RelativeSource TemplatedParent}, Path=EnableNotifyIconButton, Converter={cyc:VisibilityConverter}}" />
+																			Visibility="{Binding RelativeSource={RelativeSource TemplatedParent}, Path=EnableNotifyIconButton, Converter={converter:VisibilityConverter}}" />
 								</StackPanel>
 							</DockPanel>
 							<AdornerDecorator Grid.Row="1"
