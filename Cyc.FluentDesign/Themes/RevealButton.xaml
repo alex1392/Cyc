@@ -265,12 +265,10 @@
 									<StaticResourceExtension ResourceKey="UncheckedStoryboard" />
 								</VisualState>
 							</VisualStateGroup>
-
 						</VisualStateManager.VisualStateGroups>
 					</Grid>
 				</ControlTemplate>
 			</Setter.Value>
 		</Setter>
 	</Style>
-
 </ResourceDictionary>

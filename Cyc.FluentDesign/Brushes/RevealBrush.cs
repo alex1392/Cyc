@@ -1,4 +1,5 @@
 ﻿using Cyc.FluentDesign.Converters;
+
 using System;
 using System.Windows;
 using System.Windows.Data;
@@ -6,7 +7,11 @@ using System.Windows.Markup;
 using System.Windows.Media;
 
 namespace Cyc.FluentDesign.Brushes {
+
 	public class RevealBrush : MarkupExtension {
+
+		#region Public Methods
+
 		public override object ProvideValue(IServiceProvider serviceProvider)
 		{
 			var brush = new RadialGradientBrush
@@ -72,5 +77,7 @@ namespace Cyc.FluentDesign.Brushes {
 
 			return brush;
 		}
+
+		#endregion Public Methods
 	}
 }

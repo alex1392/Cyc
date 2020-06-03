@@ -10,8 +10,8 @@
 		<ResourceDictionary Source="RevealButton.xaml" />
 	</ResourceDictionary.MergedDictionaries>
 
-	<sys:Double x:Key="CaptionHeight">26.5</sys:Double>
-	<sys:Double x:Key="WindowButtonWidth">40</sys:Double>
+	<sys:Double x:Key="CaptionHeight">28</sys:Double>
+	<sys:Double x:Key="WindowButtonWidth">45</sys:Double>
 	<Style x:Key="WindowButtonPathStyleBase"
 				 TargetType="Path">
 		<Setter Property="Width"
@@ -100,7 +100,6 @@
 			</Path.RenderTransform>
 		</Path>
 	</DataTemplate>
-
 
 	<Style TargetType="local:RevealWindow"
 				 x:Key="RevealWindowStyle">
@@ -193,13 +192,12 @@
 														 BasedOn="{StaticResource TitleBarButtonStyle}" />
 											<Style TargetType="ToggleButton"
 														 BasedOn="{StaticResource TitleBarButtonStyle}" />
-
 										</StackPanel.Resources>
 										<Button x:Name="CloseButton"
 														ToolTip="Close"
 														Command="{Binding Source={x:Static SystemCommands.CloseWindowCommand}}"
 														ContentTemplate="{StaticResource CloseIcon}"
-														Style="{StaticResource CloseButtonStyle}"/>
+														Style="{StaticResource CloseButtonStyle}" />
 										<Grid>
 											<Button x:Name="RestoreButton"
 															ToolTip="Restore"
@@ -220,7 +218,7 @@
 																	Width="40"
 																	IsChecked="{Binding RelativeSource={RelativeSource Mode=TemplatedParent}, Path=Topmost, Mode=TwoWay}"
 																	ContentTemplate="{StaticResource TopMostIcon}"
-																	Visibility="{Binding RelativeSource={RelativeSource TemplatedParent}, Path=EnableTopmostButton, Converter={converter:VisibilityConverter}}" />
+																	Visibility="{Binding RelativeSource={RelativeSource TemplatedParent}, Path=EnableTopMostButton, Converter={converter:VisibilityConverter}}" />
 										<Button x:Name="NotifyIconButton"
 														ToolTip="Minimize to notify icon"
 														ContentTemplate="{StaticResource NotifyIcon}"

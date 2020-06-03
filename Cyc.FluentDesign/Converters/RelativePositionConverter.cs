@@ -6,7 +6,17 @@ using System.Windows.Data;
 using System.Windows.Markup;
 
 namespace Cyc.FluentDesign.Converters {
+
 	public class RelativePositionConverter : MarkupExtension, IMultiValueConverter {
+
+		#region Private Fields
+
+		private static readonly RelativePositionConverter instance = new RelativePositionConverter();
+
+		#endregion Private Fields
+
+		#region Public Methods
+
 		public object Convert(object[] values, Type targetType, object parameter, CultureInfo culture)
 		{
 			if (values.Any(o => o == DependencyProperty.UnsetValue || o == null)) {
@@ -26,10 +36,11 @@ namespace Cyc.FluentDesign.Converters {
 			throw new NotImplementedException();
 		}
 
-		private static readonly RelativePositionConverter instance = new RelativePositionConverter();
 		public override object ProvideValue(IServiceProvider serviceProvider)
 		{
 			return instance;
 		}
+
+		#endregion Public Methods
 	}
 }

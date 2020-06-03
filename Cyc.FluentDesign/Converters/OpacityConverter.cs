@@ -5,7 +5,17 @@ using System.Windows.Data;
 using System.Windows.Markup;
 
 namespace Cyc.FluentDesign.Converters {
+
 	public class OpacityConverter : MarkupExtension, IMultiValueConverter {
+
+		#region Private Fields
+
+		private static readonly OpacityConverter instance = new OpacityConverter();
+
+		#endregion Private Fields
+
+		#region Public Methods
+
 		public object Convert(object[] values, Type targetType, object parameter, CultureInfo culture)
 		{
 			if (values[0] == DependencyProperty.UnsetValue) {
@@ -21,10 +31,12 @@ namespace Cyc.FluentDesign.Converters {
 		{
 			throw new NotImplementedException();
 		}
-		private static readonly OpacityConverter instance = new OpacityConverter();
+
 		public override object ProvideValue(IServiceProvider serviceProvider)
 		{
 			return instance;
 		}
+
+		#endregion Public Methods
 	}
 }

@@ -59,19 +59,19 @@ namespace SourceChord.FluentWPF {
 	///     <MyNamespace:AcrylicWindow/>
 	///
 	/// </summary>
-	public class AcrylicWindow : Window {
-		static AcrylicWindow()
+	public class AcrylicWindowOrigin : Window {
+		static AcrylicWindowOrigin()
 		{
-			DefaultStyleKeyProperty.OverrideMetadata(typeof(AcrylicWindow), new FrameworkPropertyMetadata(typeof(AcrylicWindow)));
+			DefaultStyleKeyProperty.OverrideMetadata(typeof(AcrylicWindowOrigin), new FrameworkPropertyMetadata(typeof(AcrylicWindowOrigin)));
 
-			TintColorProperty = AcrylicElement.TintColorProperty.AddOwner(typeof(AcrylicWindow), new FrameworkPropertyMetadata(Colors.White, FrameworkPropertyMetadataOptions.Inherits));
-			TintOpacityProperty = AcrylicElement.TintOpacityProperty.AddOwner(typeof(AcrylicWindow), new FrameworkPropertyMetadata(0.6, FrameworkPropertyMetadataOptions.Inherits));
-			NoiseOpacityProperty = AcrylicElement.NoiseOpacityProperty.AddOwner(typeof(AcrylicWindow), new FrameworkPropertyMetadata(0.03, FrameworkPropertyMetadataOptions.Inherits));
-			FallbackColorProperty = AcrylicElement.FallbackColorProperty.AddOwner(typeof(AcrylicWindow), new FrameworkPropertyMetadata(Colors.LightGray, FrameworkPropertyMetadataOptions.Inherits));
-			ExtendViewIntoTitleBarProperty = AcrylicElement.ExtendViewIntoTitleBarProperty.AddOwner(typeof(AcrylicWindow), new FrameworkPropertyMetadata(false, FrameworkPropertyMetadataOptions.Inherits));
-			AcrylicWindowStyleProperty = AcrylicElement.AcrylicWindowStyleProperty.AddOwner(typeof(AcrylicWindow), new FrameworkPropertyMetadata(AcrylicWindowStyle.Normal, FrameworkPropertyMetadataOptions.Inherits));
-			TitleBarProperty = AcrylicElement.TitleBarProperty.AddOwner(typeof(AcrylicWindow), new FrameworkPropertyMetadata(null, FrameworkPropertyMetadataOptions.Inherits));
-			TitleBarModeProperty = AcrylicElement.TitleBarModeProperty.AddOwner(typeof(AcrylicWindow), new FrameworkPropertyMetadata(TitleBarMode.Default, FrameworkPropertyMetadataOptions.Inherits));
+			TintColorProperty = AcrylicElement.TintColorProperty.AddOwner(typeof(AcrylicWindowOrigin), new FrameworkPropertyMetadata(Colors.White, FrameworkPropertyMetadataOptions.Inherits));
+			TintOpacityProperty = AcrylicElement.TintOpacityProperty.AddOwner(typeof(AcrylicWindowOrigin), new FrameworkPropertyMetadata(0.6, FrameworkPropertyMetadataOptions.Inherits));
+			NoiseOpacityProperty = AcrylicElement.NoiseOpacityProperty.AddOwner(typeof(AcrylicWindowOrigin), new FrameworkPropertyMetadata(0.03, FrameworkPropertyMetadataOptions.Inherits));
+			FallbackColorProperty = AcrylicElement.FallbackColorProperty.AddOwner(typeof(AcrylicWindowOrigin), new FrameworkPropertyMetadata(Colors.LightGray, FrameworkPropertyMetadataOptions.Inherits));
+			ExtendViewIntoTitleBarProperty = AcrylicElement.ExtendViewIntoTitleBarProperty.AddOwner(typeof(AcrylicWindowOrigin), new FrameworkPropertyMetadata(false, FrameworkPropertyMetadataOptions.Inherits));
+			AcrylicWindowStyleProperty = AcrylicElement.AcrylicWindowStyleProperty.AddOwner(typeof(AcrylicWindowOrigin), new FrameworkPropertyMetadata(AcrylicWindowStyle.Normal, FrameworkPropertyMetadataOptions.Inherits));
+			TitleBarProperty = AcrylicElement.TitleBarProperty.AddOwner(typeof(AcrylicWindowOrigin), new FrameworkPropertyMetadata(null, FrameworkPropertyMetadataOptions.Inherits));
+			TitleBarModeProperty = AcrylicElement.TitleBarModeProperty.AddOwner(typeof(AcrylicWindowOrigin), new FrameworkPropertyMetadata(TitleBarMode.Default, FrameworkPropertyMetadataOptions.Inherits));
 		}
 
 		public override void OnApplyTemplate()
@@ -277,7 +277,7 @@ namespace SourceChord.FluentWPF {
 
 		// Using a DependencyProperty as the backing store for Enabled.  This enables animation, styling, binding, etc...
 		public static readonly DependencyProperty EnabledProperty =
-			DependencyProperty.RegisterAttached("Enabled", typeof(bool), typeof(AcrylicWindow), new PropertyMetadata(false, OnEnableChanged));
+			DependencyProperty.RegisterAttached("Enabled", typeof(bool), typeof(AcrylicWindowOrigin), new PropertyMetadata(false, OnEnableChanged));
 
 		private static void OnEnableChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
 		{

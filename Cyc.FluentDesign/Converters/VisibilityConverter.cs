@@ -5,7 +5,17 @@ using System.Windows.Data;
 using System.Windows.Markup;
 
 namespace Cyc.FluentDesign.Converters {
+
 	public class VisibilityConverter : MarkupExtension, IValueConverter {
+
+		#region Private Fields
+
+		private static readonly VisibilityConverter instance = new VisibilityConverter();
+
+		#endregion Private Fields
+
+		#region Public Methods
+
 		/// <summary>
 		/// Convert <see cref="bool"/> to <see cref="Visibility"/>
 		/// </summary>
@@ -18,10 +28,12 @@ namespace Cyc.FluentDesign.Converters {
 		{
 			return (Visibility)value == Visibility.Visible ? true : false;
 		}
-		private static readonly VisibilityConverter instance = new VisibilityConverter();
+
 		public override object ProvideValue(IServiceProvider serviceProvider)
 		{
 			return instance;
 		}
+
+		#endregion Public Methods
 	}
 }

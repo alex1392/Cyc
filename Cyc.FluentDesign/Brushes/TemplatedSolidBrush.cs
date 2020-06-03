@@ -5,7 +5,11 @@ using System.Windows.Markup;
 using System.Windows.Media;
 
 namespace Cyc.FluentDesign.Brushes {
+
 	public class TemplatedSolidBrush : MarkupExtension {
+
+		#region Public Methods
+
 		public override object ProvideValue(IServiceProvider serviceProvider)
 		{
 			var brush = new SolidColorBrush();
@@ -24,5 +28,7 @@ namespace Cyc.FluentDesign.Brushes {
 
 			return brush;
 		}
+
+		#endregion Public Methods
 	}
 }
