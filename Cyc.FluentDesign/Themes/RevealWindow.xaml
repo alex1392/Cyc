@@ -1,75 +1,105 @@
 ﻿<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
-                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-                    xmlns:local="clr-namespace:Cyc.FluentDesign"
-                    xmlns:i="http://schemas.microsoft.com/xaml/behaviors"
-										
-                    xmlns:converter="clr-namespace:Cyc.FluentDesign.Converters"
-                    xmlns:sys="clr-namespace:System;assembly=mscorlib">
+										xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+										xmlns:local="clr-namespace:Cyc.FluentDesign"
+										xmlns:i="http://schemas.microsoft.com/xaml/behaviors"
+										xmlns:converter="clr-namespace:Cyc.FluentDesign.Converters"
+										xmlns:sys="clr-namespace:System;assembly=mscorlib">
 
-  <ResourceDictionary.MergedDictionaries>
-    <ResourceDictionary Source="RevealButton.xaml" />
-  </ResourceDictionary.MergedDictionaries>
+	<ResourceDictionary.MergedDictionaries>
+		<ResourceDictionary Source="RevealButton.xaml" />
+	</ResourceDictionary.MergedDictionaries>
 
-  <Style x:Key="WindowButtonPathStyleBase"
-         TargetType="Path">
-    <Setter Property="Width"
-            Value="12" />
-    <Setter Property="Height"
-            Value="12" />
-    <Setter Property="UseLayoutRounding"
-            Value="True" />
-    <Setter Property="VerticalAlignment"
-            Value="Center" />
-    <Setter Property="HorizontalAlignment"
-            Value="Center" />
-  </Style>
-  <Style x:Key="WindowButtonFillPathStyle"
-         TargetType="Path"
-         BasedOn="{StaticResource WindowButtonPathStyleBase}">
-    <Setter Property="Fill"
-            Value="White" />
-  </Style>
-  <Style x:Key="WindowButtonStrokePathStyle"
-         TargetType="Path"
-         BasedOn="{StaticResource WindowButtonPathStyleBase}">
-    <Setter Property="Stroke"
-            Value="White" />
-    <Setter Property="StrokeThickness"
-            Value="1" />
-    <Setter Property="StrokeLineJoin"
-            Value="Round" />
-  </Style>
-  <DataTemplate x:Key="RestoreIcon">
+	<sys:Double x:Key="CaptionHeight">26.5</sys:Double>
+	<sys:Double x:Key="WindowButtonWidth">40</sys:Double>
+	<Style x:Key="WindowButtonPathStyleBase"
+				 TargetType="Path">
+		<Setter Property="Width"
+						Value="12" />
+		<Setter Property="Height"
+						Value="12" />
+		<Setter Property="UseLayoutRounding"
+						Value="True" />
+		<Setter Property="VerticalAlignment"
+						Value="Center" />
+		<Setter Property="HorizontalAlignment"
+						Value="Center" />
+	</Style>
+	<Style x:Key="WindowButtonFillPathStyle"
+				 TargetType="Path"
+				 BasedOn="{StaticResource WindowButtonPathStyleBase}">
+		<Setter Property="Fill"
+						Value="White" />
+	</Style>
+	<Style x:Key="WindowButtonStrokePathStyle"
+				 TargetType="Path"
+				 BasedOn="{StaticResource WindowButtonPathStyleBase}">
+		<Setter Property="Stroke"
+						Value="White" />
+		<Setter Property="StrokeThickness"
+						Value="1" />
+		<Setter Property="StrokeLineJoin"
+						Value="Round" />
+	</Style>
+	<Style x:Key="TitleBarButtonStyle"
+				 TargetType="ButtonBase"
+				 BasedOn="{StaticResource RevealButtonStyle}">
+		<Setter Property="Focusable"
+						Value="False" />
+		<Setter Property="Width"
+						Value="{StaticResource WindowButtonWidth}" />
+		<Setter Property="HorizontalContentAlignment"
+						Value="Center" />
+		<Setter Property="VerticalContentAlignment"
+						Value="Center" />
+		<Setter Property="BorderThickness"
+						Value="1" />
+		<Setter Property="IsTabStop"
+						Value="False" />
+		<Setter Property="WindowChrome.IsHitTestVisibleInChrome"
+						Value="True" />
+	</Style>
+
+	<Style x:Key="CloseButtonStyle"
+				 TargetType="ButtonBase"
+				 BasedOn="{StaticResource TitleBarButtonStyle}">
+		<Style.Triggers>
+			<Trigger Property="IsMouseOver"
+							 Value="True">
+				<Setter Property="Background"
+								Value="Red" />
+			</Trigger>
+		</Style.Triggers>
+	</Style>
+	<DataTemplate x:Key="RestoreIcon">
 		<Path Data="M1,3 L1,11 L9,11 L9,3 z M3,1 L3,2 L10,2 L10,9 L11,9 L11,1 z M2 ,0 L12,0 L12,10 L10,10 L10,12 L0,12 L0,2 L2 ,2 z"
 					Style="{StaticResource WindowButtonFillPathStyle}" />
-  </DataTemplate>
-  <DataTemplate x:Key="CloseIcon">
+	</DataTemplate>
+	<DataTemplate x:Key="CloseIcon">
 		<Path Data="M1,0 L6,5 L11,0 L12,1 L7,6 L12,11 L11,12 L6,7 L1,12 L0,11 L5,6 L0,1 z"
 					Style="{StaticResource WindowButtonFillPathStyle}" />
-  </DataTemplate>
-  <DataTemplate x:Key="MaximizeIcon">
+	</DataTemplate>
+	<DataTemplate x:Key="MaximizeIcon">
 		<Path Data="M1,1  L1 ,11 L11,11 L11,1 z M0,0 L12,0 L12,12 L0,12 z"
 					Style="{StaticResource WindowButtonFillPathStyle}" />
-  </DataTemplate>
-  <DataTemplate x:Key="MinimizeIcon">
+	</DataTemplate>
+	<DataTemplate x:Key="MinimizeIcon">
 		<Path Data="M0,5 L12,5 L12,6 L0,6 z"
 					Style="{StaticResource WindowButtonFillPathStyle}" />
-  </DataTemplate>
-  <DataTemplate x:Key="TopMostIcon">
+	</DataTemplate>
+	<DataTemplate x:Key="TopMostIcon">
 		<Path Data="M 6 12 L 6 2 L 10 6 M 6 12 L 6 2 L 2 6 M 2 1 L 10 1"
 					Style="{StaticResource WindowButtonStrokePathStyle}" />
-  </DataTemplate>
-  <DataTemplate x:Key="NotifyIcon">
+	</DataTemplate>
+	<DataTemplate x:Key="NotifyIcon">
 		<Path Data="M 6 12 L 6 3 L 10 6 M 6 12 L 6 3 L 2 6 M 2 .5 L 10 .5 M 2 2 L 10 2"
 					Style="{StaticResource WindowButtonStrokePathStyle}"
-          RenderTransformOrigin="0.5,0.5">
-      <Path.RenderTransform>
-        <RotateTransform Angle="180" />
-      </Path.RenderTransform>
-    </Path>
-  </DataTemplate>
-  <sys:Double x:Key="CaptionHeight">26.5</sys:Double>
-  <sys:Double x:Key="WindoeButtonWidth">40</sys:Double>
+					RenderTransformOrigin="0.5,0.5">
+			<Path.RenderTransform>
+				<RotateTransform Angle="180" />
+			</Path.RenderTransform>
+		</Path>
+	</DataTemplate>
+	
 
 	<Style TargetType="Window"
 				 x:Key="RevealWindowStyle">
@@ -100,126 +130,109 @@
 									BorderBrush="{TemplateBinding BorderBrush}"
 									Background="{TemplateBinding Background}"
 									BorderThickness="{TemplateBinding BorderThickness}">
-						<DockPanel x:Name="LayoutRoot"
-											 Background="{TemplateBinding Background}">
-							<DockPanel x:Name="PART_WindowTitle"
-												 DockPanel.Dock="Top"
-												 Height="{StaticResource CaptionHeight}"
-												 Background="#BB000000"
-												 local:PointerTracker.Enabled="True"
-												 local:PointerTracker.TrackerSize="{StaticResource WindoeButtonWidth}"
-												 local:PointerTracker.TrackerOpacity="1">
-								<StackPanel Orientation="Horizontal"
-														DockPanel.Dock="Left">
-									<Button x:Name="IconButton"
-													Content="{TemplateBinding Icon}"
-													VerticalAlignment="Center"
-													Margin="7,0,5,0"
-													Height="{x:Static SystemParameters.SmallIconHeight}"
-													Width="{x:Static SystemParameters.SmallIconWidth}"
-													WindowChrome.IsHitTestVisibleInChrome="True"
-													IsTabStop="False">
-										<Button.Template>
-											<ControlTemplate TargetType="{x:Type Button}">
-												<Image Source="{TemplateBinding Content}" />
-											</ControlTemplate>
-										</Button.Template>
-										<i:Interaction.Triggers>
-											<i:EventTrigger EventName="Click">
-												<i:InvokeCommandAction Command="{x:Static SystemCommands.ShowSystemMenuCommand}" />
-											</i:EventTrigger>
-											<i:EventTrigger EventName="MouseDoubleClick">
-												<i:InvokeCommandAction Command="{x:Static SystemCommands.CloseWindowCommand}" />
-											</i:EventTrigger>
-										</i:Interaction.Triggers>
-									</Button>
-									<ContentControl x:Name="TitleControl"
-																	IsTabStop="False"
-																	Foreground="White"
-																	HorizontalAlignment="Center"
-																	VerticalAlignment="Center"
-																	FontSize="{DynamicResource {x:Static SystemFonts.CaptionFontSize}}"
-																	Content="{TemplateBinding Title}" />
-								</StackPanel>
-								<StackPanel x:Name="WindowButtonsStackPanel"
-														DockPanel.Dock="Right"
-														Orientation="Horizontal"
-														FlowDirection="RightToLeft"
-														HorizontalAlignment="Right"
-														VerticalAlignment="Stretch"
-														Background="Transparent"
-														WindowChrome.IsHitTestVisibleInChrome="True">
-									<StackPanel.Resources>
-										<Style x:Key="TitleBarButtonStyle"
-													 TargetType="ButtonBase"
-													 BasedOn="{StaticResource RevealButtonStyle}">
-											<Setter Property="Focusable"
-															Value="False" />
-											<Setter Property="Background"
-															Value="#66FFFFFF" />
-											<Setter Property="Width"
-															Value="{StaticResource WindoeButtonWidth}" />
-											<Setter Property="HorizontalContentAlignment"
-															Value="Center" />
-											<Setter Property="VerticalContentAlignment"
-															Value="Center" />
-											<Setter Property="BorderThickness"
-															Value="1" />
-											<Setter Property="IsTabStop"
-															Value="False" />
-											<Setter Property="WindowChrome.IsHitTestVisibleInChrome"
-															Value="True" />
-										</Style>
-										<Style TargetType="local:RevealButton"
-													 BasedOn="{StaticResource TitleBarButtonStyle}" />
-										<Style TargetType="ToggleButton"
-													 BasedOn="{StaticResource TitleBarButtonStyle}" />
-									</StackPanel.Resources>
-									<local:RevealButton x:Name="CloseButton"
-																			ToolTip="Close"
-																			Command="{Binding Source={x:Static SystemCommands.CloseWindowCommand}}"
-																			ContentTemplate="{StaticResource CloseIcon}" />
-									<Grid>
-										<local:RevealButton x:Name="RestoreButton"
-																				ToolTip="Restore"
-																				Command="{Binding Source={x:Static SystemCommands.RestoreWindowCommand}}"
-																				ContentTemplate="{StaticResource RestoreIcon}"
-																				Visibility="Collapsed" />
-										<local:RevealButton x:Name="MaximizeButton"
-																				ToolTip="Maximize"
-																				Command="{Binding Source={x:Static SystemCommands.MaximizeWindowCommand}}"
-																				ContentTemplate="{StaticResource MaximizeIcon}" />
-									</Grid>
-									<local:RevealButton x:Name="MinimizeButton"
-																			ToolTip="Minimize"
-																			Command="{Binding Source={x:Static SystemCommands.MinimizeWindowCommand}}"
-																			ContentTemplate="{StaticResource MinimizeIcon}" />
-									<ToggleButton x:Name="TopMostButton"
-																ToolTip="Top Most Window"
-																Width="40"
-																IsChecked="{Binding RelativeSource={RelativeSource Mode=TemplatedParent}, Path=Topmost, Mode=TwoWay}"
-																ContentTemplate="{StaticResource TopMostIcon}"
-																Visibility="{Binding RelativeSource={RelativeSource TemplatedParent}, Path=EnableTopmostButton, Converter={converter:VisibilityConverter}}" />
-									<local:RevealButton x:Name="NotifyIconButton"
-																			ToolTip="Minimize to notify icon"
-																			ContentTemplate="{StaticResource NotifyIcon}"
-																			Command="{Binding RelativeSource={RelativeSource TemplatedParent}, Path=NotifyIconCommand}"
-																			Visibility="{Binding RelativeSource={RelativeSource TemplatedParent}, Path=EnableNotifyIconButton, Converter={converter:VisibilityConverter}}" />
-								</StackPanel>
+						<Grid>
+							<DockPanel x:Name="LayoutRoot">
+								<DockPanel x:Name="PART_WindowTitle"
+													 DockPanel.Dock="Top"
+													 Height="{StaticResource CaptionHeight}"
+													 Background="{DynamicResource {x:Static SystemColors.WindowFrameBrushKey}}"
+													 local:PointerTracker.Enabled="True"
+													 local:PointerTracker.TrackerSize="{StaticResource WindowButtonWidth}"
+													 local:PointerTracker.TrackerOpacity="1">
+									<StackPanel x:Name="TitleBarPanel"
+															Orientation="Horizontal"
+															DockPanel.Dock="Left">
+										<Button x:Name="IconButton"
+														Content="{TemplateBinding Icon}"
+														VerticalAlignment="Center"
+														Margin="7,0,5,0"
+														Height="{x:Static SystemParameters.SmallIconHeight}"
+														Width="{x:Static SystemParameters.SmallIconWidth}"
+														WindowChrome.IsHitTestVisibleInChrome="True"
+														IsTabStop="False">
+											<!--Instead of setting content directly, it is needed to use template in order to override the default looking of a button-->
+											<Button.Template>
+												<ControlTemplate TargetType="{x:Type Button}">
+													<Image Source="{TemplateBinding Content}" />
+												</ControlTemplate>
+											</Button.Template>
+											<i:Interaction.Triggers>
+												<i:EventTrigger EventName="Click">
+													<i:InvokeCommandAction Command="{x:Static SystemCommands.ShowSystemMenuCommand}" />
+												</i:EventTrigger>
+												<i:EventTrigger EventName="MouseDoubleClick">
+													<i:InvokeCommandAction Command="{x:Static SystemCommands.CloseWindowCommand}" />
+												</i:EventTrigger>
+											</i:Interaction.Triggers>
+										</Button>
+										<ContentControl x:Name="TitleControl"
+																		IsTabStop="False"
+																		Foreground="White"
+																		HorizontalAlignment="Center"
+																		VerticalAlignment="Center"
+																		FontSize="{DynamicResource {x:Static SystemFonts.CaptionFontSize}}"
+																		Content="{TemplateBinding Title}" />
+									</StackPanel>
+									<StackPanel x:Name="WindowButtonsStackPanel"
+															DockPanel.Dock="Right"
+															Orientation="Horizontal"
+															FlowDirection="RightToLeft"
+															HorizontalAlignment="Right"
+															VerticalAlignment="Stretch"
+															Background="Transparent"
+															WindowChrome.IsHitTestVisibleInChrome="True">
+										<StackPanel.Resources>
+											<Style TargetType="Button"
+														 BasedOn="{StaticResource TitleBarButtonStyle}" />
+											<Style TargetType="ToggleButton"
+														 BasedOn="{StaticResource TitleBarButtonStyle}" />
+
+										</StackPanel.Resources>
+										<Button x:Name="CloseButton"
+														ToolTip="Close"
+														Command="{Binding Source={x:Static SystemCommands.CloseWindowCommand}}"
+														ContentTemplate="{StaticResource CloseIcon}"
+														Style="{StaticResource CloseButtonStyle}"/>
+										<Grid>
+											<Button x:Name="RestoreButton"
+															ToolTip="Restore"
+															Command="{Binding Source={x:Static SystemCommands.RestoreWindowCommand}}"
+															ContentTemplate="{StaticResource RestoreIcon}"
+															Visibility="Collapsed" />
+											<Button x:Name="MaximizeButton"
+															ToolTip="Maximize"
+															Command="{Binding Source={x:Static SystemCommands.MaximizeWindowCommand}}"
+															ContentTemplate="{StaticResource MaximizeIcon}" />
+										</Grid>
+										<Button x:Name="MinimizeButton"
+														ToolTip="Minimize"
+														Command="{Binding Source={x:Static SystemCommands.MinimizeWindowCommand}}"
+														ContentTemplate="{StaticResource MinimizeIcon}" />
+										<ToggleButton x:Name="TopMostButton"
+																	ToolTip="Top Most Window"
+																	Width="40"
+																	IsChecked="{Binding RelativeSource={RelativeSource Mode=TemplatedParent}, Path=Topmost, Mode=TwoWay}"
+																	ContentTemplate="{StaticResource TopMostIcon}"
+																	Visibility="{Binding RelativeSource={RelativeSource TemplatedParent}, Path=EnableTopmostButton, Converter={converter:VisibilityConverter}}" />
+										<Button x:Name="NotifyIconButton"
+														ToolTip="Minimize to notify icon"
+														ContentTemplate="{StaticResource NotifyIcon}"
+														Command="{Binding RelativeSource={RelativeSource TemplatedParent}, Path=NotifyIconCommand}"
+														Visibility="{Binding RelativeSource={RelativeSource TemplatedParent}, Path=EnableNotifyIconButton, Converter={converter:VisibilityConverter}}" />
+									</StackPanel>
+								</DockPanel>
+								<AdornerDecorator KeyboardNavigation.IsTabStop="False">
+									<ContentPresenter x:Name="MainContentPresenter"
+																		KeyboardNavigation.TabNavigation="Cycle" />
+								</AdornerDecorator>
 							</DockPanel>
-							<AdornerDecorator Grid.Row="1"
-																KeyboardNavigation.IsTabStop="False">
-								<ContentPresenter x:Name="MainContentPresenter"
-																	KeyboardNavigation.TabNavigation="Cycle" />
-							</AdornerDecorator>
 							<ResizeGrip x:Name="ResizeGrip"
 													HorizontalAlignment="Right"
 													VerticalAlignment="Bottom"
-													Grid.Row="1"
 													IsTabStop="False"
 													Visibility="Hidden"
 													WindowChrome.ResizeGripDirection="BottomRight" />
-						</DockPanel>
+						</Grid>
 					</Border>
 
 					<ControlTemplate.Triggers>

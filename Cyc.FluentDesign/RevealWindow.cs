@@ -3,16 +3,19 @@ using Cyc.FluentDesign.Converters;
 using System;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
+using System.Diagnostics;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Interop;
 using System.Windows.Media.Imaging;
-
-using NotifyIcon = System.Windows.Forms.NotifyIcon;
+using Forms = System.Windows.Forms;
 
 namespace Cyc.FluentDesign {
 	public class RevealWindow : Window, INotifyPropertyChanged {
+		/// <summary>
+		/// Allow usage in xaml
+		/// </summary>
 		static RevealWindow()
 		{
 			DefaultStyleKeyProperty.OverrideMetadata(typeof(RevealWindow), new FrameworkPropertyMetadata(typeof(RevealWindow)));
@@ -21,6 +24,7 @@ namespace Cyc.FluentDesign {
 		{
 			SetSystemCommandBinding();
 			InitializeNotifyIcon();
+			Loaded += Window_Loaded;
 		}
 
 		private void Window_Loaded(object sender, RoutedEventArgs e)
@@ -28,15 +32,10 @@ namespace Cyc.FluentDesign {
 			SetNotifyIcon();
 		}
 
-		protected override void OnMouseLeftButtonDown(MouseButtonEventArgs e)
-		{
-			base.OnMouseLeftButtonDown(e);
-
-		}
 		protected override void OnContentRendered(EventArgs e)
 		{
 			base.OnContentRendered(e);
-			if (SizeToContent == SizeToContent.WidthAndHeight) {
+			if (SizeToContent != SizeToContent.Manual) {
 				InvalidateMeasure();
 			}
 		}
@@ -123,13 +122,12 @@ namespace Cyc.FluentDesign {
 
 		[Description("Showing NotifyIcon Button in the title bar")]
 		public bool EnableNotifyIconButton { get; set; } = true;
-		protected NotifyIcon NotifyIcon { get; set; }
+		protected Forms::NotifyIcon NotifyIcon { get; set; }
 		public ICommand NotifyIconCommand { get; set; }
 
 		private void InitializeNotifyIcon()
 		{
-			NotifyIcon = new NotifyIcon();
-			Loaded += Window_Loaded;
+			NotifyIcon = new Forms::NotifyIcon();
 			NotifyIcon.MouseDoubleClick += NotifyIcon_MouseDoubleClick;
 			NotifyIconCommand = new RelayCommand(MinimizeToNotifyIcon);
 		}
@@ -142,7 +140,7 @@ namespace Cyc.FluentDesign {
 			Hide();
 			NotifyIcon.Visible = true;
 		}
-		private void NotifyIcon_MouseDoubleClick(object sender, System.Windows.Forms.MouseEventArgs e)
+		private void NotifyIcon_MouseDoubleClick(object sender, Forms::MouseEventArgs e)
 		{
 			Show();
 			WindowState = WindowState.Normal;
@@ -204,7 +202,12 @@ namespace Cyc.FluentDesign {
 		#endregion
 
 		#region DragMove
-		public bool EnableDragMove { get; set; }
+		public bool EnableDragMove { get; set; } = false;
+		protected override void OnMouseLeftButtonDown(MouseButtonEventArgs e)
+		{
+			base.OnMouseLeftButtonDown(e);
+			ProcessDragMove(e);
+		}
 		private void ProcessDragMove(MouseButtonEventArgs e)
 		{
 			if (EnableDragMove && e.ButtonState == MouseButtonState.Pressed) {

@@ -82,7 +82,8 @@
 		<Setter Property="Template">
 			<Setter.Value>
 				<ControlTemplate TargetType="ButtonBase">
-					<Grid x:Name="root">
+					<Grid x:Name="root"
+								Background="{TemplateBinding Background}">
 						<Border x:Name="borderLight"
 										BorderThickness="{TemplateBinding BorderThickness}"
 										Visibility="{Binding RelativeSource={RelativeSource TemplatedParent}, Path=(local:PointerTracker.EnableBorderLight), Converter={converter:VisibilityConverter}}"
@@ -267,7 +268,6 @@
 
 						</VisualStateManager.VisualStateGroups>
 					</Grid>
-
 				</ControlTemplate>
 			</Setter.Value>
 		</Setter>
