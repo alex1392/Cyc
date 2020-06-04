@@ -101,6 +101,7 @@
 		</Path>
 	</DataTemplate>
 
+
 	<Style TargetType="local:RevealWindow"
 				 x:Key="RevealWindowStyle">
 		<Setter Property="Foreground"

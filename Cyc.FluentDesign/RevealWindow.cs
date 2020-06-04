@@ -1,5 +1,5 @@
 ﻿using Cyc.FluentDesign.Converters;
-
+using SourceChord.FluentWPF;
 using System;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
@@ -10,7 +10,6 @@ using System.Windows.Interop;
 using System.Windows.Media.Imaging;
 
 using Forms = System.Windows.Forms;
-using FW = SourceChord.FluentWPF;
 
 namespace Cyc.FluentDesign {
 
@@ -62,7 +61,7 @@ namespace Cyc.FluentDesign {
 		#endregion Public Constructors
 	}
 
-	public partial class RevealWindow : FW::AcrylicWindow, INotifyPropertyChanged {
+	public partial class RevealWindow : AcrylicWindow, INotifyPropertyChanged {
 
 		#region Private Fields
 
