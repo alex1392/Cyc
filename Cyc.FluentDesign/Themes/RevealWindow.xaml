@@ -103,7 +103,7 @@
 
 
 	<Style TargetType="local:RevealWindow"
-				 x:Key="RevealWindowStyle">
+				 >
 		<Setter Property="Foreground"
 						Value="{DynamicResource {x:Static SystemColors.WindowTextBrushKey}}" />
 		<Setter Property="BorderThickness"
