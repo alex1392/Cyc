@@ -1,5 +1,7 @@
 ﻿using Cyc.FluentDesign.Converters;
+
 using SourceChord.FluentWPF;
+
 using System;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
@@ -18,7 +20,6 @@ namespace Cyc.FluentDesign {
 		#region Public Fields
 
 		public const int WM_MOUSEHWHEEL = 0x020E;
-		public const int WM_MOUSEWHEEL = 0x020A;
 
 		#endregion Public Fields
 
@@ -63,6 +64,19 @@ namespace Cyc.FluentDesign {
 
 	public partial class RevealWindow : AcrylicWindow, INotifyPropertyChanged {
 
+		#region Public Fields
+
+		public static readonly DependencyProperty MaximizeCommandProperty =
+			DependencyProperty.Register("MaximizeCommand", typeof(ICommand), typeof(RevealWindow), new PropertyMetadata());
+
+		public static readonly DependencyProperty MinimizeCommandProperty =
+			DependencyProperty.Register("MinimizeCommand", typeof(ICommand), typeof(RevealWindow), new PropertyMetadata());
+
+		public static readonly DependencyProperty RestoreCommandProperty =
+			DependencyProperty.Register("RestoreCommand", typeof(ICommand), typeof(RevealWindow), new PropertyMetadata());
+
+		#endregion Public Fields
+
 		#region Private Fields
 
 		private StackPanel TitlebarControlsStackPanel;
@@ -78,6 +92,7 @@ namespace Cyc.FluentDesign {
 		#endregion Public Events
 
 		#region Public Properties
+
 		[Browsable(true)]
 		[Description("Enable draging the window from anywhere inside the window.")]
 		public bool EnableDragMove { get; set; } = false;
@@ -90,10 +105,26 @@ namespace Cyc.FluentDesign {
 		[Description("Show Topmost Button in title bar.")]
 		public bool EnableTopMostButton { get; set; } = true;
 
+		public ICommand MaximizeCommand {
+			get { return (ICommand)GetValue(MaximizeCommandProperty); }
+			set { SetValue(MaximizeCommandProperty, value); }
+		}
+
+		public ICommand MinimizeCommand {
+			get { return (ICommand)GetValue(MinimizeCommandProperty); }
+			set { SetValue(MinimizeCommandProperty, value); }
+		}
+
+		public ICommand NotifyIconCommand { get; set; }
+
+		public ICommand RestoreCommand {
+			get { return (ICommand)GetValue(RestoreCommandProperty); }
+			set { SetValue(RestoreCommandProperty, value); }
+		}
+
 		[Browsable(true)]
 		[Description("Add custom controls to title bar.")]
 		public Collection<Control> TitlebarControls { get; set; } = new Collection<Control>();
-		public ICommand NotifyIconCommand { get; set; }
 
 		#endregion Public Properties
 
@@ -135,6 +166,46 @@ namespace Cyc.FluentDesign {
 
 		#region Protected Methods
 
+		protected virtual void BrowseBack(object sender, ExecutedRoutedEventArgs e)
+		{
+			
+		}
+
+		protected virtual void BrowseForward(object sender, ExecutedRoutedEventArgs e)
+		{
+			
+		}
+
+		protected virtual void BrowseHome(object sender, ExecutedRoutedEventArgs e)
+		{
+			
+		}
+
+		protected virtual void CanMinimizeWindow(object sender, CanExecuteRoutedEventArgs e)
+		{
+			e.CanExecute = CanMinimizeWindow();
+		}
+
+		protected virtual void CanResizeWindow(object sender, CanExecuteRoutedEventArgs e)
+		{
+			e.CanExecute = CanResizeWindow();
+		}
+
+		protected virtual void CloseWindow(object sender, ExecutedRoutedEventArgs e)
+		{
+			Close();
+		}
+
+		protected virtual void MaximizeWindow(object sender, ExecutedRoutedEventArgs e)
+		{
+			MaximizeWindow();
+		}
+
+		protected virtual void MinimizeWindow(object sender, ExecutedRoutedEventArgs e)
+		{
+			MinimizeWindow();
+		}
+
 		protected override void OnContentRendered(EventArgs e)
 		{
 			base.OnContentRendered(e);
@@ -163,6 +234,23 @@ namespace Cyc.FluentDesign {
 			HookWin32Message();
 		}
 
+		protected virtual void RestoreWindow(object sender, ExecutedRoutedEventArgs e)
+		{
+			RestoreWindow();
+		}
+
+		protected virtual void ShowSystemMenu(object sender, ExecutedRoutedEventArgs e)
+		{
+			if (!(e.OriginalSource is FrameworkElement element)) {
+				return;
+			}
+
+			var point = WindowState == WindowState.Maximized ? new Point(0, element.ActualHeight)
+				: new Point(Left + BorderThickness.Left, element.ActualHeight + Top + BorderThickness.Top);
+			point = element.TransformToAncestor(this).Transform(point);
+			SystemCommands.ShowSystemMenu(this, point);
+		}
+
 		#endregion Protected Methods
 
 		#region Private Methods
@@ -175,19 +263,14 @@ namespace Cyc.FluentDesign {
 			}
 		}
 
-		private void CanMinimizeWindow(object sender, CanExecuteRoutedEventArgs e)
+		private bool CanMinimizeWindow()
 		{
-			e.CanExecute = ResizeMode != ResizeMode.NoResize;
+			return ResizeMode != ResizeMode.NoResize;
 		}
 
-		private void CanResizeWindow(object sender, CanExecuteRoutedEventArgs e)
+		private bool CanResizeWindow()
 		{
-			e.CanExecute = ResizeMode == ResizeMode.CanResize || ResizeMode == ResizeMode.CanResizeWithGrip;
-		}
-
-		private void CloseWindow(object sender, ExecutedRoutedEventArgs e)
-		{
-			Close();
+			return ResizeMode == ResizeMode.CanResize || ResizeMode == ResizeMode.CanResizeWithGrip;
 		}
 
 		/// <summary>
@@ -196,11 +279,6 @@ namespace Cyc.FluentDesign {
 		private void HookMouseHWheel(int delta)
 		{
 			OnMouseHWheel(delta); // propagate event
-		}
-
-		private void HookMouseWheel(int delta)
-		{
-			// Write behavior for MouseWheel event
 		}
 
 		private void HookWin32Message()
@@ -213,10 +291,10 @@ namespace Cyc.FluentDesign {
 		{
 			NotifyIcon = new Forms::NotifyIcon();
 			NotifyIcon.MouseDoubleClick += NotifyIcon_MouseDoubleClick;
-			NotifyIconCommand = new MinimizeToIconCommand(MinimizeToNotifyIcon);
+			NotifyIconCommand = new RelayCommand(MinimizeToNotifyIcon);
 		}
 
-		private void MaximizeWindow(object sender, ExecutedRoutedEventArgs e)
+		private void MaximizeWindow()
 		{
 			SystemCommands.MaximizeWindow(this);
 		}
@@ -227,7 +305,7 @@ namespace Cyc.FluentDesign {
 			NotifyIcon.Visible = true;
 		}
 
-		private void MinimizeWindow(object sender, ExecutedRoutedEventArgs e)
+		private void MinimizeWindow()
 		{
 			SystemCommands.MinimizeWindow(this);
 		}
@@ -246,7 +324,7 @@ namespace Cyc.FluentDesign {
 			}
 		}
 
-		private void RestoreWindow(object sender, ExecutedRoutedEventArgs e)
+		private void RestoreWindow()
 		{
 			SystemCommands.RestoreWindow(this);
 		}
@@ -258,23 +336,19 @@ namespace Cyc.FluentDesign {
 
 		private void SetSystemCommandBinding()
 		{
+			MaximizeCommand = new RelayCommand(MaximizeWindow, CanResizeWindow);
+			MinimizeCommand = new RelayCommand(MinimizeWindow, CanMinimizeWindow);
+			RestoreCommand = new RelayCommand(RestoreWindow, CanResizeWindow);
+
 			CommandBindings.Add(new CommandBinding(SystemCommands.CloseWindowCommand, CloseWindow));
 			CommandBindings.Add(new CommandBinding(SystemCommands.MaximizeWindowCommand, MaximizeWindow, CanResizeWindow));
 			CommandBindings.Add(new CommandBinding(SystemCommands.MinimizeWindowCommand, MinimizeWindow, CanMinimizeWindow));
 			CommandBindings.Add(new CommandBinding(SystemCommands.RestoreWindowCommand, RestoreWindow, CanResizeWindow));
 			CommandBindings.Add(new CommandBinding(SystemCommands.ShowSystemMenuCommand, ShowSystemMenu));
-		}
 
-		private void ShowSystemMenu(object sender, ExecutedRoutedEventArgs e)
-		{
-			if (!(e.OriginalSource is FrameworkElement element)) {
-				return;
-			}
-
-			var point = WindowState == WindowState.Maximized ? new Point(0, element.ActualHeight)
-				: new Point(Left + BorderThickness.Left, element.ActualHeight + Top + BorderThickness.Top);
-			point = element.TransformToAncestor(this).Transform(point);
-			SystemCommands.ShowSystemMenu(this, point);
+			CommandBindings.Add(new CommandBinding(NavigationCommands.BrowseBack, BrowseBack));
+			CommandBindings.Add(new CommandBinding(NavigationCommands.BrowseForward, BrowseForward));
+			CommandBindings.Add(new CommandBinding(NavigationCommands.BrowseHome, BrowseHome));
 		}
 
 		private void Window_Loaded(object sender, RoutedEventArgs e)
@@ -292,16 +366,10 @@ namespace Cyc.FluentDesign {
 		/// <returns>Return specific value for specific message. Check documents of Win32 message processing.</returns>
 		private IntPtr WndProc(IntPtr hwnd, int msg, IntPtr wParam, IntPtr lParam, ref bool handled)
 		{
-			int delta;
 			switch (msg) {
 				case WndIDs.WM_MOUSEHWHEEL:
-					delta = (short)wParam.HIWORD();
+					int delta = (short)wParam.HIWORD();
 					HookMouseHWheel(delta);
-					return (IntPtr)1;
-
-				case WndIDs.WM_MOUSEWHEEL:
-					delta = (short)wParam.HIWORD();
-					HookMouseWheel(delta);
 					return (IntPtr)1;
 			}
 			return IntPtr.Zero;
@@ -310,11 +378,12 @@ namespace Cyc.FluentDesign {
 		#endregion Private Methods
 	}
 
-	internal class MinimizeToIconCommand : ICommand {
+	internal class RelayCommand : ICommand {
 
 		#region Private Fields
 
 		private readonly Action action;
+		private readonly Func<bool> canAction;
 
 		#endregion Private Fields
 
@@ -326,9 +395,10 @@ namespace Cyc.FluentDesign {
 
 		#region Public Constructors
 
-		public MinimizeToIconCommand(Action action)
+		public RelayCommand(Action action, Func<bool> canAction = null)
 		{
 			this.action = action;
+			this.canAction = canAction;
 		}
 
 		#endregion Public Constructors
@@ -337,12 +407,12 @@ namespace Cyc.FluentDesign {
 
 		public bool CanExecute(object parameter)
 		{
-			return true;
+			return canAction == null || canAction.Invoke();
 		}
 
 		public void Execute(object parameter)
 		{
-			action?.Invoke();
+			action.Invoke();
 		}
 
 		#endregion Public Methods

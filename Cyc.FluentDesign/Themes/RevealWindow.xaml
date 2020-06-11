@@ -101,9 +101,7 @@
 		</Path>
 	</DataTemplate>
 
-
-	<Style TargetType="local:RevealWindow"
-				 >
+	<Style TargetType="local:RevealWindow">
 		<Setter Property="Foreground"
 						Value="{DynamicResource {x:Static SystemColors.WindowTextBrushKey}}" />
 		<Setter Property="BorderThickness"
@@ -132,7 +130,7 @@
 		</Setter>
 		<Setter Property="Template">
 			<Setter.Value>
-				<ControlTemplate TargetType="Window">
+				<ControlTemplate TargetType="local:RevealWindow">
 					<Border x:Name="WindowBorder"
 									BorderBrush="{TemplateBinding BorderBrush}"
 									Background="{TemplateBinding Background}"
@@ -167,9 +165,6 @@
 												<i:EventTrigger EventName="Click">
 													<i:InvokeCommandAction Command="{x:Static SystemCommands.ShowSystemMenuCommand}" />
 												</i:EventTrigger>
-												<i:EventTrigger EventName="MouseDoubleClick">
-													<i:InvokeCommandAction Command="{x:Static SystemCommands.CloseWindowCommand}" />
-												</i:EventTrigger>
 											</i:Interaction.Triggers>
 										</Button>
 										<ContentControl x:Name="TitleControl"
@@ -202,17 +197,17 @@
 										<Grid>
 											<Button x:Name="RestoreButton"
 															ToolTip="Restore"
-															Command="{Binding Source={x:Static SystemCommands.RestoreWindowCommand}}"
+															Command="{TemplateBinding RestoreCommand}"
 															ContentTemplate="{StaticResource RestoreIcon}"
 															Visibility="Collapsed" />
 											<Button x:Name="MaximizeButton"
 															ToolTip="Maximize"
-															Command="{Binding Source={x:Static SystemCommands.MaximizeWindowCommand}}"
+															Command="{TemplateBinding MaximizeCommand}"
 															ContentTemplate="{StaticResource MaximizeIcon}" />
 										</Grid>
 										<Button x:Name="MinimizeButton"
 														ToolTip="Minimize"
-														Command="{Binding Source={x:Static SystemCommands.MinimizeWindowCommand}}"
+														Command="{TemplateBinding MinimizeCommand}"
 														ContentTemplate="{StaticResource MinimizeIcon}" />
 										<ToggleButton x:Name="TopMostButton"
 																	ToolTip="Top Most Window"
@@ -252,7 +247,7 @@
 											Value="Visible" />
 							<Setter TargetName="LayoutRoot"
 											Property="Margin"
-											Value="7" />
+											Value="5" />
 						</Trigger>
 						<Trigger Property="WindowState"
 										 Value="Normal">
@@ -263,19 +258,6 @@
 											Property="Visibility"
 											Value="Collapsed" />
 						</Trigger>
-						<Trigger Property="ResizeMode"
-										 Value="NoResize">
-							<Setter TargetName="MinimizeButton"
-											Property="Visibility"
-											Value="Collapsed" />
-							<Setter TargetName="MaximizeButton"
-											Property="Visibility"
-											Value="Collapsed" />
-							<Setter TargetName="RestoreButton"
-											Property="Visibility"
-											Value="Collapsed" />
-						</Trigger>
-
 						<MultiTrigger>
 							<MultiTrigger.Conditions>
 								<Condition Property="ResizeMode"
