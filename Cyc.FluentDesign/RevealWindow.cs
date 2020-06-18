@@ -149,6 +149,26 @@ namespace Cyc.FluentDesign {
 			SetSystemCommandBinding();
 			InitializeNotifyIcon();
 			Loaded += Window_Loaded;
+
+			void InitializeNotifyIcon()
+			{
+				NotifyIcon = new Forms::NotifyIcon();
+				NotifyIcon.MouseDoubleClick += NotifyIcon_MouseDoubleClick;
+				NotifyIconCommand = new RelayCommand(MinimizeToNotifyIcon);
+			}
+
+			void SetSystemCommandBinding()
+			{
+				MaximizeCommand = new RelayCommand(MaximizeWindow, CanResizeWindow);
+				MinimizeCommand = new RelayCommand(MinimizeWindow, CanMinimizeWindow);
+				RestoreCommand = new RelayCommand(RestoreWindow, CanResizeWindow);
+
+				CommandBindings.Add(new CommandBinding(SystemCommands.CloseWindowCommand, CloseWindow));
+				CommandBindings.Add(new CommandBinding(SystemCommands.MaximizeWindowCommand, MaximizeWindow, CanResizeWindow));
+				CommandBindings.Add(new CommandBinding(SystemCommands.MinimizeWindowCommand, MinimizeWindow, CanMinimizeWindow));
+				CommandBindings.Add(new CommandBinding(SystemCommands.RestoreWindowCommand, RestoreWindow, CanResizeWindow));
+				CommandBindings.Add(new CommandBinding(SystemCommands.ShowSystemMenuCommand, ShowSystemMenu));
+			}
 		}
 
 		#endregion Public Constructors
@@ -165,21 +185,6 @@ namespace Cyc.FluentDesign {
 		#endregion Public Methods
 
 		#region Protected Methods
-
-		protected virtual void BrowseBack(object sender, ExecutedRoutedEventArgs e)
-		{
-			
-		}
-
-		protected virtual void BrowseForward(object sender, ExecutedRoutedEventArgs e)
-		{
-			
-		}
-
-		protected virtual void BrowseHome(object sender, ExecutedRoutedEventArgs e)
-		{
-			
-		}
 
 		protected virtual void CanMinimizeWindow(object sender, CanExecuteRoutedEventArgs e)
 		{
@@ -287,12 +292,7 @@ namespace Cyc.FluentDesign {
 			source?.AddHook(WndProc); // Hook Win32 Messages to method
 		}
 
-		private void InitializeNotifyIcon()
-		{
-			NotifyIcon = new Forms::NotifyIcon();
-			NotifyIcon.MouseDoubleClick += NotifyIcon_MouseDoubleClick;
-			NotifyIconCommand = new RelayCommand(MinimizeToNotifyIcon);
-		}
+		
 
 		private void MaximizeWindow()
 		{
@@ -334,22 +334,7 @@ namespace Cyc.FluentDesign {
 			NotifyIcon.Icon = (Icon as BitmapSource).ToBitmap().ToIcon();
 		}
 
-		private void SetSystemCommandBinding()
-		{
-			MaximizeCommand = new RelayCommand(MaximizeWindow, CanResizeWindow);
-			MinimizeCommand = new RelayCommand(MinimizeWindow, CanMinimizeWindow);
-			RestoreCommand = new RelayCommand(RestoreWindow, CanResizeWindow);
-
-			CommandBindings.Add(new CommandBinding(SystemCommands.CloseWindowCommand, CloseWindow));
-			CommandBindings.Add(new CommandBinding(SystemCommands.MaximizeWindowCommand, MaximizeWindow, CanResizeWindow));
-			CommandBindings.Add(new CommandBinding(SystemCommands.MinimizeWindowCommand, MinimizeWindow, CanMinimizeWindow));
-			CommandBindings.Add(new CommandBinding(SystemCommands.RestoreWindowCommand, RestoreWindow, CanResizeWindow));
-			CommandBindings.Add(new CommandBinding(SystemCommands.ShowSystemMenuCommand, ShowSystemMenu));
-
-			CommandBindings.Add(new CommandBinding(NavigationCommands.BrowseBack, BrowseBack));
-			CommandBindings.Add(new CommandBinding(NavigationCommands.BrowseForward, BrowseForward));
-			CommandBindings.Add(new CommandBinding(NavigationCommands.BrowseHome, BrowseHome));
-		}
+		
 
 		private void Window_Loaded(object sender, RoutedEventArgs e)
 		{
