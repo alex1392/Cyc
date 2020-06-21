@@ -13,55 +13,8 @@ using System.Windows.Media.Imaging;
 
 using Forms = System.Windows.Forms;
 
-namespace Cyc.FluentDesign {
-
-	public static class WndIDs {
-
-		#region Public Fields
-
-		public const int WM_MOUSEHWHEEL = 0x020E;
-
-		#endregion Public Fields
-
-		#region Public Methods
-
-		/// <summary>
-		/// Gets high bits values of the pointer.
-		/// </summary>
-		public static int HIWORD(this IntPtr ptr)
-		{
-			return (ptr.ToInt32() >> 16) & 0xFFFF;
-		}
-
-		/// <summary>
-		/// Gets low bits values of the pointer.
-		/// </summary>
-		public static int LOWORD(this IntPtr ptr)
-		{
-			return ptr.ToInt32() & 0xFFFF;
-		}
-
-		#endregion Public Methods
-	}
-
-	public class MouseTiltEventArgs : EventArgs {
-
-		#region Public Properties
-
-		public int Tilt { get; set; }
-
-		#endregion Public Properties
-
-		#region Public Constructors
-
-		public MouseTiltEventArgs(int tilt)
-		{
-			Tilt = tilt;
-		}
-
-		#endregion Public Constructors
-	}
-
+namespace Cyc.FluentDesign
+{
 	public partial class RevealWindow : AcrylicWindow, INotifyPropertyChanged {
 
 		#region Public Fields
@@ -361,45 +314,5 @@ namespace Cyc.FluentDesign {
 		}
 
 		#endregion Private Methods
-	}
-
-	internal class RelayCommand : ICommand {
-
-		#region Private Fields
-
-		private readonly Action action;
-		private readonly Func<bool> canAction;
-
-		#endregion Private Fields
-
-		#region Public Events
-
-		public event EventHandler CanExecuteChanged;
-
-		#endregion Public Events
-
-		#region Public Constructors
-
-		public RelayCommand(Action action, Func<bool> canAction = null)
-		{
-			this.action = action;
-			this.canAction = canAction;
-		}
-
-		#endregion Public Constructors
-
-		#region Public Methods
-
-		public bool CanExecute(object parameter)
-		{
-			return canAction == null || canAction.Invoke();
-		}
-
-		public void Execute(object parameter)
-		{
-			action.Invoke();
-		}
-
-		#endregion Public Methods
 	}
 }
