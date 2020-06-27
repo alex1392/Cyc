@@ -1,5 +1,5 @@
-using Cyc.Standard;
 
+using MLog = Microsoft.Extensions.Logging;
 using Microsoft.Graph;
 using Microsoft.Identity.Client;
 
@@ -13,6 +13,7 @@ using System.Net.Http.Headers;
 using System.Security;
 using System.Threading;
 using System.Threading.Tasks;
+using Microsoft.Extensions.Logging;
 
 namespace Cyc.MicrosoftApi {
 
@@ -124,7 +125,7 @@ namespace Cyc.MicrosoftApi {
 
 		private readonly List<IAccount> accountList = new List<IAccount>();
 		private readonly GraphServiceClient graphClient;
-		private readonly ILogger logger;
+		private readonly MLog::ILogger logger;
 		private readonly IPublicClientApplication msalClient;
 		private string appId;
 		private string password;
@@ -143,7 +144,7 @@ namespace Cyc.MicrosoftApi {
 
 		#region Public Constructors
 
-		public MicrosoftApiManager(ILogger logger = null, string authority = Authority.Common)
+		public MicrosoftApiManager(MLog::ILogger logger = null, string authority = Authority.Common)
 		{
 			graphClient = new GraphServiceClient(this);
 			this.logger = logger;
@@ -193,12 +194,11 @@ namespace Cyc.MicrosoftApi {
 				try {
 					page = await request.GetAsync(cts.Token).ConfigureAwait(false);
 				} catch (TaskCanceledException ex) {
-					logger?.Log(ex);
+					logger?.LogError(ex, "Use canncel the task.");
 					TaskExecuted?.Invoke(this, null);
 					yield break;
 				} catch (ServiceException ex) {
-					// onedrive server errors
-					logger?.Log(ex);
+					logger?.LogError(ex, "onedrive server error.");
 					TaskExecuted?.Invoke(this, null);
 					yield break;
 				}
@@ -218,8 +218,7 @@ namespace Cyc.MicrosoftApi {
 			try {
 				return await graphClient.Users[userId].Drive.Root.Request().GetAsync(cts.Token).ConfigureAwait(false);
 			} catch (ServiceException ex) {
-				// onedrive server errors
-				logger?.Log(ex);
+				logger?.LogError(ex, "onedrive server error");
 				return null;
 			} finally {
 				TaskExecuted?.Invoke(this, null);
@@ -234,7 +233,7 @@ namespace Cyc.MicrosoftApi {
 			try {
 				return await graphClient.Users[userId].Drive.Items[fileId].Content.Request().GetAsync(cts.Token).ConfigureAwait(false);
 			} catch (ServiceException ex) {
-				logger?.Log(ex);
+				logger?.LogError(ex, "onedrive server error");
 				return null;
 			} finally {
 				TaskExecuted?.Invoke(this, null);
@@ -250,8 +249,7 @@ namespace Cyc.MicrosoftApi {
 				var user = await graphClient.Users[userId].Request().GetAsync(cts.Token).ConfigureAwait(false);
 				return user;
 			} catch (ServiceException ex) {
-				// onedrive server errors
-				logger?.Log(ex);
+				logger?.LogError(ex, "onedrive server error");
 				return null;
 			} finally {
 				TaskExecuted?.Invoke(this, null);
@@ -277,7 +275,7 @@ namespace Cyc.MicrosoftApi {
 
 					RegisterUser(result?.Account);
 				} catch (Exception ex) {
-					logger?.Log(ex);
+					logger?.LogError(ex, "onedrive server error");
 					continue;
 				}
 				yield return result;
@@ -296,11 +294,11 @@ namespace Cyc.MicrosoftApi {
 				RegisterUser(result?.Account);
 				return result;
 			} catch (MsalClientException) {
-				Console.WriteLine("User cancelled");
+				logger?.LogInformation("User cancelled.");
 			} catch (MsalException ex) {
-				Console.WriteLine(ex.Message);
+				logger?.LogWarning(ex, "Masl exception.");
 			} catch (InvalidOperationException ex) {
-				logger?.Log(ex);
+				logger?.LogError(ex, "");
 			}
 			TaskExecuted?.Invoke(this, null);
 			return null;
@@ -322,12 +320,18 @@ namespace Cyc.MicrosoftApi {
 					.ConfigureAwait(false);
 				RegisterUser(result?.Account);
 				return result;
-			} catch (MsalClientException) {
-				Console.WriteLine("User cancelled");
-			} catch (MsalException ex) {
-				Console.WriteLine(ex.Message);
-			} catch (InvalidOperationException ex) {
-				logger?.Log(ex);
+			}
+			catch (MsalClientException)
+			{
+				logger?.LogInformation("User cancelled.");
+			}
+			catch (MsalException ex)
+			{
+				logger?.LogWarning(ex, "Masl exception.");
+			}
+			catch (InvalidOperationException ex)
+			{
+				logger?.LogError(ex, "");
 			}
 			TaskExecuted?.Invoke(this, null);
 			return null;
@@ -369,7 +373,7 @@ namespace Cyc.MicrosoftApi {
 				accountList.Remove(account);
 				return true;
 			} catch (Exception ex) {
-				logger?.Log(ex);
+				logger?.LogError(ex, "");
 				return false;
 			} finally {
 				TaskExecuted?.Invoke(this, null);
@@ -436,8 +440,7 @@ namespace Cyc.MicrosoftApi {
 				var result = await LoginInteractively(account, ex.Claims).ConfigureAwait(false);
 				return result?.AccessToken;
 			} catch (ServiceException ex) {
-				// onedrive server errors
-				logger?.Log(ex);
+				logger?.LogError(ex, "onedrive server error");
 				return null;
 			}
 		}
